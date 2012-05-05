@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="20dp">
+
+
+        <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="2dp"-->
+                <!--android:background="#DADADA"/>-->
+        <TextView
+                android:text="Time left: "
+                style="@style/CodeFont_global_header"
+                android:layout_marginTop="10dp"/>
+
+        <TextView
+                android:id="@+id/timeleft"
+                style="@style/CodeFont_global"/>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#DADADA"
+                android:layout_marginTop="20dp"/>
+        <TextView
+                android:text="Current speed: "
+                style="@style/CodeFont_global_header"/>
+
+        <TextView
+                android:id="@+id/speed"
+                style="@style/CodeFont_global"/>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#DADADA"
+                android:layout_marginTop="20dp"/>
+        <TextView
+                android:text="Total download size: "
+                style="@style/CodeFont_global_header"/>
+
+        <TextView
+                android:id="@+id/size"
+                style="@style/CodeFont_global"/>
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#DADADA"
+                android:layout_marginTop="20dp"/>
+        <TextView
+                android:text="Estimated time remaining: "
+                style="@style/CodeFont_global_header"/>
+
+        <TextView
+                android:id="@+id/eta"
+                style="@style/CodeFont_global"/>
+    </LinearLayout>
+</merge>

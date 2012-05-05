@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+            android:defaultValue="85.113.244.21"
+            android:title="@string/hostname"
+            android:key="hostnamePref"
+            android:inputType="textUri"
+            android:name="Hostname Preference"/>
+    <EditTextPreference
+            android:summary="@string/port"
+            android:defaultValue="8081"
+            android:title="@string/port"
+            android:key="portPref"
+            android:inputType="number"
+            android:name="Port Preference"/>
+    <EditTextPreference
+            android:summary="@string/apikey"
+            android:title="@string/apikey"
+            android:defaultValue="0fe0029b80e62dc7f48ddaf8a3297d2d"
+            android:key="apikeyPref"
+            android:inputType="text"
+            android:name="Apikey Preference"/>
+    <EditTextPreference
+            android:summary="@string/min_size_sum"
+            android:title="@string/min_size"
+            android:key="minsizePref"
+            android:inputType="number"
+            android:name="Minimal size Preference"/>
+
+</PreferenceScreen>
