@@ -1,13 +1,16 @@
 package nl.napauleon.downloadmanager.search;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import nl.napauleon.downloadmanager.ContextHelper;
 import nl.napauleon.downloadmanager.http.HttpGetTask;
-import nl.napauleon.downloadmanager.http.RefreshMainAsyncTaskHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -15,30 +18,20 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by IntelliJ IDEA.
- * User: napauleon
- * Date: 3/4/12
- * Time: 5:43 PM
- * To change this template use File | Settings | File Templates.
- */
 public class SearchClickListener implements AdapterView.OnItemClickListener {
 
-    private final String hostname;
-    private final String port;
-    private final String apikey;
-    private final List<NzbInfo> results;
     private static final String ENCODING = "UTF-8";
     private static final String TAG = "SearchClickListener";
 
-    public SearchClickListener(SharedPreferences prefs, List<NzbInfo> results) {
+    private final List<NzbInfo> results;
+    private final Activity activity;
+
+    public SearchClickListener(Activity activity, List<NzbInfo> results) {
+        this.activity = activity;
         this.results = results;
-        hostname = prefs.getString("hostnamePref", "");
-        port = prefs.getString("portPref", "");
-        apikey = prefs.getString("apikeyPref", "");
     }
 
-    String createConnectionString(NzbInfo nzbInfo) {
+    String createConnectionString(SharedPreferences preferences, NzbInfo nzbInfo) {
         try {
 
             String link = nzbInfo.getLink();
@@ -48,9 +41,12 @@ public class SearchClickListener implements AdapterView.OnItemClickListener {
             if (matcher.find()) {
                 name = matcher.group(1);
             }
-            return "http://" + hostname + ":" + port + "/api?mode=addurl&apikey=" + apikey
-                    + "&name=" + URLEncoder.encode(link, ENCODING)
-                    + "&nzbname=" + URLEncoder.encode(name, ENCODING);
+            return String.format("http://%s:%s/api?mode=addurl&apikey=%s&name=%s&nzbname=%s",
+                    preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
+                    preferences.getString(ContextHelper.PORT_PREF, ""),
+                    preferences.getString(ContextHelper.APIKEY_PREF, ""),
+                    URLEncoder.encode(link, ENCODING),
+                    URLEncoder.encode(name, ENCODING));
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, "Unsupported encoding: " + ENCODING, e);
         }
@@ -63,11 +59,10 @@ public class SearchClickListener implements AdapterView.OnItemClickListener {
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        if (hostname == null || hostname.isEmpty() || port == null || port.isEmpty()) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext());
-                            builder.setMessage("Settings are not valid. Check host and port configuration.").setNeutralButton("Ok", null).show();
-                        } else {
-                            new HttpGetTask(new RefreshMainAsyncTaskHandler(parent.getContext())).execute(createConnectionString(results.get(position)));
+                        SharedPreferences preferences = new ContextHelper().checkAndGetSettings(parent.getContext());
+                        if (preferences != null) {
+                            new HttpGetTask(new SearchHandler())
+                                    .execute(createConnectionString(preferences, results.get(position)));
                         }
                     }
                 })
@@ -77,5 +72,18 @@ public class SearchClickListener implements AdapterView.OnItemClickListener {
                     }
                 })
                 .show();
+    }
+
+    class SearchHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case HttpGetTask.MSG_RESULT:
+                    activity.finish();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
     }
 }

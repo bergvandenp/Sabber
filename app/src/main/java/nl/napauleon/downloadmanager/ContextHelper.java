@@ -17,15 +17,24 @@ public class ContextHelper {
         String port = prefs.getString(PORT_PREF, "");
         String apikey = prefs.getString(APIKEY_PREF, "");
 
-        if (hostname == null ||  hostname.isEmpty()
-                || port == null || port.isEmpty()
-                || apikey == null || apikey.isEmpty()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Settings are not valid. Check host and port configuration.")
-                    .setNeutralButton("Ok", null).show();
-            return prefs;
-        } else {
+        if (hostname == null ||  hostname.equals("")
+                || port == null || port.equals("")
+                || apikey == null || apikey.equals("")) {
+            showConnectionErrorAlert(context);
             return null;
+        } else {
+            return prefs;
         }
+    }
+
+    public void showConnectionErrorAlert(Context context) {
+        showErrorAlert(context, "Settings are not valid. Check host and port configuration.");
+    }
+
+    public void showErrorAlert(Context context, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message)
+                .setNeutralButton("Ok", null)
+                .show();
     }
 }

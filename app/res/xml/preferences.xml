@@ -2,14 +2,14 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
-            android:defaultValue="85.113.244.21"
+            android:defaultValue=""
             android:title="@string/hostname"
             android:key="hostnamePref"
             android:inputType="textUri"
             android:name="Hostname Preference"/>
     <EditTextPreference
             android:summary="@string/port"
-            android:defaultValue="8081"
+            android:defaultValue="8080"
             android:title="@string/port"
             android:key="portPref"
             android:inputType="number"
@@ -17,7 +17,7 @@
     <EditTextPreference
             android:summary="@string/apikey"
             android:title="@string/apikey"
-            android:defaultValue="0fe0029b80e62dc7f48ddaf8a3297d2d"
+            android:defaultValue=""
             android:key="apikeyPref"
             android:inputType="text"
             android:name="Apikey Preference"/>

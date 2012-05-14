@@ -14,5 +14,6 @@
     <string name="min_size">Minimal nzb size</string>
     <string name="set_preferences">Settings</string>
     <string name="min_size_sum">Minimal nzb size in MB</string>
+    <string name="menu_pause">Pause</string>
 
 </resources>

@@ -1,11 +1,25 @@
 package nl.napauleon.downloadmanager;
 
-/**
- * Created with IntelliJ IDEA.
- * User: napauleon
- * Date: 5/9/12
- * Time: 9:35 PM
- * To change this template use File | Settings | File Templates.
- */
-public class RefreshHandler {
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.Fragment;
+import nl.napauleon.downloadmanager.http.HttpGetTask;
+
+public class RefreshHandler extends Handler {
+    private final Fragment fragment;
+
+    public RefreshHandler(Fragment fragment) {
+        this.fragment = fragment;
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+        switch (msg.what) {
+            case HttpGetTask.MSG_RESULT:
+                fragment.onResume();
+                break;
+            default:
+                super.handleMessage(msg);
+        }
+    }
 }

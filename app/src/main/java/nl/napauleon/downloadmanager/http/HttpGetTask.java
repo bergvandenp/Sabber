@@ -1,29 +1,48 @@
 package nl.napauleon.downloadmanager.http;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class HttpGetTask extends AsyncTask<String, Void, String> {
 
-    private static final String TAG = "HttpGetTask";
-    private AsyncTaskHandler handler;
+    public static final int MSG_RESULT = 1;
+    public static final int MSG_CONNECTIONERROR = 2;
 
-    public HttpGetTask(AsyncTaskHandler handler) {
+    private static final String TAG = "HttpGetTask";
+
+    private Handler handler;
+
+    public HttpGetTask(Handler handler) {
         this.handler = handler;
     }
 
-	@Override
+    @Override
     protected String doInBackground(String... strings) {
         InputStream content = null;
         try {
-            HttpClient httpclient = new DefaultHttpClient();
+            HttpParams httpParameters = new BasicHttpParams();
+// Set the timeout in milliseconds until a connection is established.
+// The default value is zero, that means the timeout is not used.
+            int timeoutConnection = 3000;
+            HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+// Set the default socket timeout (SO_TIMEOUT)
+// in milliseconds which is the timeout for waiting for data.
+            int timeoutSocket = 5000;
+            HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+            HttpClient httpclient = new DefaultHttpClient(httpParameters);
             HttpResponse response = httpclient.execute(new HttpGet(strings[0]));
             content = response.getEntity().getContent();
         } catch (Exception e) {
@@ -40,25 +59,15 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
     public void onPostExecute(String result) {
     	if(result == null) {
         	Log.e(TAG, "no result available");
+            handler.sendMessage(handler.obtainMessage(MSG_CONNECTIONERROR, result));
     		return;
         }
 		try {
-			processResult(result);
-		} catch (JSONException e) {
-			Log.e(TAG, "Error parsing json string", e);
+            Log.i(TAG, "Http result: " + result);
+            handler.sendMessage(handler.obtainMessage(MSG_RESULT, result));
 		} catch (ClassCastException e) {
             Log.e(TAG, "No valid response from the downloadserver", e);
-		} catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "No valid encoding", e);
-        }
-    }
-	
-	private void processResult(String result) throws JSONException, UnsupportedEncodingException {
-        if(handler != null) {
-            handler.handleResult(result);
-        }else {
-            new DefaultAsyncTaskHandler().handleResult(result);
-        }
+		}
     }
 
 	private StringBuilder inputStreamToString(InputStream is) {

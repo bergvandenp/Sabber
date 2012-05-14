@@ -7,6 +7,10 @@
           android:title="@string/menu_refresh"
           android:icon="@drawable/ic_action_refresh"
           android:showAsAction="ifRoom"/>
+    <item android:id="@+id/menu_pause"
+          android:title="@string/menu_pause"
+          android:icon="@drawable/ic_pause"
+          android:showAsAction="ifRoom"/>
     <item android:id="@+id/menu_settings"
           android:title="@string/settings"/>
 </menu>
