@@ -3,7 +3,6 @@ package nl.napauleon.downloadmanager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -13,6 +12,7 @@ import com.actionbarsherlock.view.MenuItem;
 import nl.napauleon.downloadmanager.Queue.DownloadingFragment;
 import nl.napauleon.downloadmanager.history.HistoryFragment;
 import nl.napauleon.downloadmanager.http.HttpGetTask;
+import nl.napauleon.downloadmanager.http.HttpHandler;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -69,8 +69,10 @@ public class MainActivity extends SherlockFragmentActivity {
         if (menuItem != null) {
             if(paused) {
                 menuItem.setIcon(R.drawable.ic_play);
+                menuItem.setTitle(R.string.menu_play);
             } else {
                 menuItem.setIcon(R.drawable.ic_pause);
+                menuItem.setTitle(R.string.menu_pause);
             }
 
         }
@@ -129,7 +131,11 @@ public class MainActivity extends SherlockFragmentActivity {
                 preferences.getString(ContextHelper.APIKEY_PREF, ""));
     }
 
-    private class PauseToggleHandler extends Handler {
+    private class PauseToggleHandler extends HttpHandler {
+        public PauseToggleHandler() {
+            super(MainActivity.this);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

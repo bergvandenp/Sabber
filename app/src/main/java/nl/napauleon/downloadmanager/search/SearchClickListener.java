@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import nl.napauleon.downloadmanager.ContextHelper;
+import nl.napauleon.downloadmanager.R;
 import nl.napauleon.downloadmanager.http.HttpGetTask;
 
 import java.io.UnsupportedEncodingException;
@@ -55,22 +56,24 @@ public class SearchClickListener implements AdapterView.OnItemClickListener {
 
     public void onItemClick(final AdapterView<?> parent, View view, final int position, final long rowId) {
         new AlertDialog.Builder(parent.getContext())
-                .setTitle("Send this nzb to downloadserver?")
+                .setTitle(parent.getContext().getString(R.string.question_send_nzb))
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        SharedPreferences preferences = new ContextHelper().checkAndGetSettings(parent.getContext());
-                        if (preferences != null) {
-                            new HttpGetTask(new SearchHandler())
-                                    .execute(createConnectionString(preferences, results.get(position)));
-                        }
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
+                .setPositiveButton(parent.getContext().getString(R.string.option_positive),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                SharedPreferences preferences = new ContextHelper().checkAndGetSettings(parent.getContext());
+                                if (preferences != null) {
+                                    new HttpGetTask(new SearchHandler())
+                                            .execute(createConnectionString(preferences, results.get(position)));
+                                }
+                            }
+                        })
+                .setNegativeButton(parent.getContext().getString(R.string.option_negative),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        })
                 .show();
     }
 

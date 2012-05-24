@@ -2,14 +2,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>downloadmanager</artifactId>
+    <artifactId>sabber</artifactId>
     <packaging>apk</packaging>
-    <name>Downloadmanager Android app</name>
+    <name>Sabber Android app</name>
 
     <parent>
         <version>0.0.1-SNAPSHOT</version>
-        <groupId>nl.napauleon.downloadmanager</groupId>
-        <artifactId>downloadmanager-parent</artifactId>
+        <groupId>nl.napauleon.sabber</groupId>
+        <artifactId>sabber-parent</artifactId>
     </parent>
 
     <properties>
@@ -41,17 +41,6 @@
             <version>${abs.version}</version>
             <type>jar</type>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.roboguice</groupId>
-            <artifactId>roboguice</artifactId>
-            <version>1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>2.0-no_aop</version>
         </dependency>
 
         <dependency>

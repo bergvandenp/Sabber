@@ -10,13 +10,6 @@ import nl.napauleon.downloadmanager.R;
 
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: napauleon
- * Date: 3/5/12
- * Time: 8:54 PM
- * To change this template use File | Settings | File Templates.
- */
 public class SearchListAdapter extends ArrayAdapter<NzbInfo> {
 
     private List<NzbInfo> content;

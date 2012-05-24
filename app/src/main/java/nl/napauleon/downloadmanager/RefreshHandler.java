@@ -1,14 +1,15 @@
 package nl.napauleon.downloadmanager;
 
-import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import nl.napauleon.downloadmanager.http.HttpGetTask;
+import nl.napauleon.downloadmanager.http.HttpHandler;
 
-public class RefreshHandler extends Handler {
+public class RefreshHandler extends HttpHandler {
     private final Fragment fragment;
 
     public RefreshHandler(Fragment fragment) {
+        super(fragment.getActivity());
         this.fragment = fragment;
     }
 

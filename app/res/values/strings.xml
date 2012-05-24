@@ -15,5 +15,21 @@
     <string name="set_preferences">Settings</string>
     <string name="min_size_sum">Minimal nzb size in MB</string>
     <string name="menu_pause">Pause</string>
+    <string name="menu_play">Resume</string>
+
+    <string name="title_select_category">Pick a category</string>
+    <string name="question_delete_nzb">Delete the selected nzb?</string>
+    <string name="question_send_nzb">Send this nzb to downloadserver?</string>
+    <string name="title_loading">Loading. Please wait…</string>
+
+    <string name="option_delete_nzb">Delete item</string>
+    <string name="option_change_category">Change category</string>
+    <string name="option_positive">Yes</string>
+    <string name="option_negative">No</string>
+    <string name="text_time_finished">Estimated time finished:</string>
+    <string name="text_total_size">Total download size:</string>
+    <string name="text_itemname">name</string>
+    <string name="text_time_left">Time left:</string>
+    <string name="text_speed">Current speed:</string>
 
 </resources>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="#f1f1f1">
 
     <TextView
         android:id="@+id/itemname"
@@ -9,7 +10,6 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:maxWidth="600dp"
-        android:text="testname"
         android:textAppearance="@android:style/TextAppearance.Medium">
     </TextView>
 
@@ -19,7 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="testdatum"
         android:textAppearance="@android:style/TextAppearance.Medium">
     </TextView>
 

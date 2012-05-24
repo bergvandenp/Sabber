@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
@@ -34,16 +33,13 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
         InputStream content = null;
         try {
             HttpParams httpParameters = new BasicHttpParams();
-// Set the timeout in milliseconds until a connection is established.
-// The default value is zero, that means the timeout is not used.
+            // Set the timeout in milliseconds until a connection is established.
             int timeoutConnection = 3000;
             HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-// Set the default socket timeout (SO_TIMEOUT)
-// in milliseconds which is the timeout for waiting for data.
+            // Set the default socket timeout (SO_TIMEOUT) in milliseconds which is the timeout for waiting for data.
             int timeoutSocket = 5000;
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-            HttpClient httpclient = new DefaultHttpClient(httpParameters);
-            HttpResponse response = httpclient.execute(new HttpGet(strings[0]));
+            HttpResponse response = new DefaultHttpClient(httpParameters).execute(new HttpGet(strings[0]));
             content = response.getEntity().getContent();
         } catch (Exception e) {
             Log.e(TAG, "Network exception", e);
@@ -83,7 +79,7 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
                 total.append(line);
             }
         } catch (IOException e) {
-            Log.e("DownloadManager", "Error reading inputstream", e);
+            Log.e("Sabber", "Error reading inputstream", e);
         }
 
         // Return full string

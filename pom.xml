@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nl.napauleon.downloadmanager</groupId>
-	<artifactId>downloadmanager-parent</artifactId>
+	<groupId>nl.napauleon.sabber</groupId>
+	<artifactId>sabber-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>DownloadManager parent</name>
+	<name>Sabber parent</name>
 	<properties>
 		<android.version>4.0.1.2</android.version>
 	</properties>

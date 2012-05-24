@@ -8,13 +8,8 @@
             android:orientation="vertical"
             android:paddingLeft="20dp">
 
-
-        <!--<View-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="2dp"-->
-                <!--android:background="#DADADA"/>-->
         <TextView
-                android:text="Time left: "
+                android:text="@string/text_time_left"
                 style="@style/CodeFont_global_header"
                 android:layout_marginTop="10dp"/>
 
@@ -27,7 +22,7 @@
                 android:background="#DADADA"
                 android:layout_marginTop="20dp"/>
         <TextView
-                android:text="Current speed: "
+                android:text="@string/text_speed"
                 style="@style/CodeFont_global_header"/>
 
         <TextView
@@ -39,7 +34,7 @@
                 android:background="#DADADA"
                 android:layout_marginTop="20dp"/>
         <TextView
-                android:text="Total download size: "
+                android:text="@string/text_total_size"
                 style="@style/CodeFont_global_header"/>
 
         <TextView
@@ -51,7 +46,7 @@
                 android:background="#DADADA"
                 android:layout_marginTop="20dp"/>
         <TextView
-                android:text="Estimated time remaining: "
+                android:text="@string/text_time_finished"
                 style="@style/CodeFont_global_header"/>
 
         <TextView

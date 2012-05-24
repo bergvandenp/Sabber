@@ -5,13 +5,13 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import nl.napauleon.downloadmanager.ContextHelper;
 import nl.napauleon.downloadmanager.R;
 import nl.napauleon.downloadmanager.http.HttpGetTask;
+import nl.napauleon.downloadmanager.http.HttpHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,7 +30,7 @@ import java.util.List;
 
 public class SearchableActivity extends ListActivity{
 
-    public static final String MINSIZE_PREF = "minsizePref";
+    private static final String MINSIZE_PREF = "minsizePref";
     private static final String TAG = "SearchableActivity";
 
     private ProgressDialog dialog;
@@ -59,16 +59,9 @@ public class SearchableActivity extends ListActivity{
         setIntent(intent);
         handleIntent(intent);
     }
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.main_menu, menu);
-//        return true;
-//    }
 
     private void searchNzbs(String query) {
-        dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+        dialog = ProgressDialog.show(this, "", getString(R.string.title_loading), true);
         String searchString = createSearchString(query);
         Log.i(TAG, "searching with url: " + searchString);
         new HttpGetTask(new SearchHandler()).execute(searchString);
@@ -86,7 +79,11 @@ public class SearchableActivity extends ListActivity{
         }
     }
 
-    class SearchHandler extends Handler {
+    class SearchHandler extends HttpHandler {
+        public SearchHandler() {
+            super(SearchableActivity.this);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

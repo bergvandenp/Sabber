@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import java.util.List;
 
 public class DownloadingFragment extends SherlockListFragment {
 
-    public static final String TAG = "DownloadingFragment";
     private TextView timeLeftView, speedView, sizeView, etaView;
 
     @Override
@@ -72,50 +70,72 @@ public class DownloadingFragment extends SherlockListFragment {
                     try {
                         JSONObject queue = ((JSONObject) new JSONTokener((String) msg.obj)
                                 .nextValue()).getJSONObject("queue");
-                        if(getActivity() instanceof MainActivity) {
-                            ((MainActivity) getActivity()).setPaused(queue.getBoolean("paused"));
-                            if(Build.VERSION.SDK_INT >= 11) {
-                                getActivity().invalidateOptionsMenu();
-                            }
-                        }
-                        JSONArray jsonCategories = queue.getJSONArray("categories");
-                        List<String> categories = new ArrayList<String>(jsonCategories.length());
-                        for (int i = 0; i < jsonCategories.length(); i++) {
-                            categories.add(jsonCategories.getString(i));
-                        }
-                        JSONArray slots = queue.getJSONArray("slots");
-                        List<QueueInfo> queueItems = new ArrayList<QueueInfo>(slots.length());
-                        for (int i = 0; i < slots.length(); i++) {
-                            JSONObject slot = slots.getJSONObject(i);
-                            queueItems.add(new QueueInfo(
-                                    slot.getString("nzo_id"),
-                                    slot.getString("filename"),
-                                    slot.getString("timeleft"),
-                                    slot.getInt("percentage")));
-                        }
+
+                        togglePause(queue);
+
+                        List<QueueInfo> queueItems = retrieveQueueItems(queue);
                         setListAdapter(new QueueListAdapter(getActivity(), queueItems));
-                        if (timeLeftView != null) {
-                            timeLeftView.setText(queue.getString("timeleft"));
-                        }
-                        if (sizeView != null) {
-                            sizeView.setText(queue.getString("size"));
-                        }
-                        if (speedView != null) {
-                            speedView.setText(queue.getString("speed"));
-                        }
-                        if (etaView != null) {
-                            etaView.setText(queue.getString("eta"));
-                        }
-                        getListView().setOnItemClickListener(new QueueClickListener(DownloadingFragment.this, queueItems, categories));
-                        getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
+                        getListView().setOnItemClickListener(new QueueClickListener(DownloadingFragment.this,
+                                queueItems, retrieveCategories(queue.getJSONArray("categories"))));
+
+                        populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
+                                queue.getString("speed"), queue.getString("eta"));
                     } catch (JSONException e) {
-                        Log.e(TAG, "Error parsing json string", e);
+                        new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
+                    } finally {
+                        getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
                     }
                     break;
                 default:
                     getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
                     super.handleMessage(msg);
             }
+        }
+
+        private List<QueueInfo> retrieveQueueItems(JSONObject queue) throws JSONException {
+            JSONArray slots = queue.getJSONArray("slots");
+            List<QueueInfo> queueItems = new ArrayList<QueueInfo>(slots.length());
+            for (int i = 0; i < slots.length(); i++) {
+                JSONObject slot = slots.getJSONObject(i);
+                queueItems.add(new QueueInfo(
+                        slot.getString("nzo_id"),
+                        slot.getString("filename"),
+                        slot.getString("timeleft"),
+                        slot.getInt("percentage")));
+            }
+            return queueItems;
+        }
+
+        private List<String> retrieveCategories(JSONArray jsonCategories) throws JSONException {
+            List<String> categories = new ArrayList<String>(jsonCategories.length());
+            for (int i = 0; i < jsonCategories.length(); i++) {
+                categories.add(jsonCategories.getString(i));
+            }
+            return categories;
+        }
+
+        private void togglePause(JSONObject queue) throws JSONException {
+            if(getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).setPaused(queue.getBoolean("paused"));
+                if(Build.VERSION.SDK_INT >= 11) {
+                    getActivity().invalidateOptionsMenu();
+                }
+            }
+        }
+    }
+
+    private void populateGlobalInformation(String timeleft, String size, String speed, String eta) throws JSONException {
+        if (timeLeftView != null) {
+            timeLeftView.setText(timeleft);
+        }
+        if (sizeView != null) {
+            sizeView.setText(size);
+        }
+        if (speedView != null) {
+            speedView.setText(speed);
+        }
+        if (etaView != null) {
+            etaView.setText(eta);
         }
     }
 }

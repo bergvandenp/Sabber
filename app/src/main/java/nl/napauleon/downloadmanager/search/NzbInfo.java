@@ -1,12 +1,5 @@
 package nl.napauleon.downloadmanager.search;
 
-/**
- * Created by IntelliJ IDEA.
- * User: napauleon
- * Date: 2/29/12
- * Time: 8:02 PM
- * To change this template use File | Settings | File Templates.
- */
 public class NzbInfo {
     private String title, link, size;
     
