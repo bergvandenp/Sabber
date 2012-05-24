@@ -1,8 +1,8 @@
-package nl.napauleon.downloadmanager.Queue;
+package nl.napauleon.sabber.Queue;
 
 import java.util.List;
 
-import nl.napauleon.downloadmanager.R;
+import nl.napauleon.sabber.R;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;

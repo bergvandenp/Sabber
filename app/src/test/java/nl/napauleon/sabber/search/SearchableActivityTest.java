@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.search;
+package nl.napauleon.sabber.search;
 
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 import org.junit.Before;

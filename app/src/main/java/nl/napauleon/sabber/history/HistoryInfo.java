@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.history;
+package nl.napauleon.sabber.history;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager;
+package nl.napauleon.sabber;
 
 import android.app.AlertDialog;
 import android.content.Context;

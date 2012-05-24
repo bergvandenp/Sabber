@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.search;
+package nl.napauleon.sabber.search;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -8,10 +8,10 @@ import android.os.Bundle;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import nl.napauleon.downloadmanager.ContextHelper;
-import nl.napauleon.downloadmanager.R;
-import nl.napauleon.downloadmanager.http.HttpGetTask;
-import nl.napauleon.downloadmanager.http.HttpHandler;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.HttpHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

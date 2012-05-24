@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.http;
+package nl.napauleon.sabber.http;
 
 import android.os.AsyncTask;
 import android.os.Handler;

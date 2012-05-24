@@ -1,9 +1,9 @@
-package nl.napauleon.downloadmanager.http;
+package nl.napauleon.sabber.http;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import nl.napauleon.downloadmanager.ContextHelper;
+import nl.napauleon.sabber.ContextHelper;
 
 public class HttpHandler extends Handler {
 

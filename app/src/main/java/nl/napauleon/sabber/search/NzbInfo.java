@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.search;
+package nl.napauleon.sabber.search;
 
 public class NzbInfo {
     private String title, link, size;

@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.Queue;
+package nl.napauleon.sabber.Queue;
 
 public class QueueInfo {
 

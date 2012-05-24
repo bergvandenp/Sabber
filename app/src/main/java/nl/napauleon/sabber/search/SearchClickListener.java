@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.search;
+package nl.napauleon.sabber.search;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,9 +9,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import nl.napauleon.downloadmanager.ContextHelper;
-import nl.napauleon.downloadmanager.R;
-import nl.napauleon.downloadmanager.http.HttpGetTask;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.HttpGetTask;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

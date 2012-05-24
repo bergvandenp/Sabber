@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager;
+package nl.napauleon.sabber;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,10 +9,10 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import nl.napauleon.downloadmanager.Queue.DownloadingFragment;
-import nl.napauleon.downloadmanager.history.HistoryFragment;
-import nl.napauleon.downloadmanager.http.HttpGetTask;
-import nl.napauleon.downloadmanager.http.HttpHandler;
+import nl.napauleon.sabber.Queue.DownloadingFragment;
+import nl.napauleon.sabber.history.HistoryFragment;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.HttpHandler;
 
 public class MainActivity extends SherlockFragmentActivity {
 

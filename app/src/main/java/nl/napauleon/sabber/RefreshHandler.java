@@ -1,9 +1,9 @@
-package nl.napauleon.downloadmanager;
+package nl.napauleon.sabber;
 
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import nl.napauleon.downloadmanager.http.HttpGetTask;
-import nl.napauleon.downloadmanager.http.HttpHandler;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.HttpHandler;
 
 public class RefreshHandler extends HttpHandler {
     private final Fragment fragment;

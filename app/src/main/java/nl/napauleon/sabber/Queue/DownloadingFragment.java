@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.Queue;
+package nl.napauleon.sabber.Queue;
 
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -9,11 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockListFragment;
-import nl.napauleon.downloadmanager.ContextHelper;
-import nl.napauleon.downloadmanager.MainActivity;
-import nl.napauleon.downloadmanager.R;
-import nl.napauleon.downloadmanager.http.HttpGetTask;
-import nl.napauleon.downloadmanager.http.HttpHandler;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.HttpHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

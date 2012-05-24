@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.history;
+package nl.napauleon.sabber.history;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import nl.napauleon.downloadmanager.R;
+import nl.napauleon.sabber.R;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.history;
+package nl.napauleon.sabber.history;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,10 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.actionbarsherlock.app.SherlockListFragment;
-import nl.napauleon.downloadmanager.ContextHelper;
-import nl.napauleon.downloadmanager.R;
-import nl.napauleon.downloadmanager.http.HttpGetTask;
-import nl.napauleon.downloadmanager.http.HttpHandler;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.HttpHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

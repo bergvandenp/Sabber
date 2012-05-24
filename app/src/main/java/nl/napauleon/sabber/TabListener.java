@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager;
+package nl.napauleon.sabber;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;

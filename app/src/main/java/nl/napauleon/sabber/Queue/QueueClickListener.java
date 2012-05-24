@@ -1,4 +1,4 @@
-package nl.napauleon.downloadmanager.Queue;
+package nl.napauleon.sabber.Queue;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -8,10 +8,10 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import nl.napauleon.downloadmanager.ContextHelper;
-import nl.napauleon.downloadmanager.R;
-import nl.napauleon.downloadmanager.RefreshHandler;
-import nl.napauleon.downloadmanager.http.HttpGetTask;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.RefreshHandler;
+import nl.napauleon.sabber.http.HttpGetTask;
 
 import java.util.Arrays;
 import java.util.List;
