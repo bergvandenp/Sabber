@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.napauleon.sabber</groupId>
 	<artifactId>sabber-parent</artifactId>
@@ -9,10 +7,17 @@ http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<name>Sabber parent</name>
 	<properties>
 		<android.version>4.0.1.2</android.version>
+		<github.maven.repository>file:///Users/napauleon/.m2/repository/</github.maven.repository>
 	</properties>
     <modules>
         <module>app</module>
     </modules>
+    <distributionManagement>
+  	<repository>
+  		<id>maven-repository</id>
+  		<url>${github.maven.repository}</url>
+  	</repository>
+  </distributionManagement>
     <scm>
         <url>https://github.com/bergvandenp/Sabber</url>
         <connection>scm:git:git://github.com/bergvandenp/Sabber.git</connection>
