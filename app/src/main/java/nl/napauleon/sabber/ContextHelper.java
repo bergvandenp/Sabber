@@ -16,19 +16,23 @@ public class ContextHelper {
     private static final String TAG = "Sabber";
 
     public SharedPreferences checkAndGetSettings(Context context) {
+        if (!isSabnzbSettingsPresent(context)) {
+            showConnectionErrorAlert(context);
+            return null;
+        } else {
+            return PreferenceManager.getDefaultSharedPreferences(context);
+        }
+    }
+
+    public boolean isSabnzbSettingsPresent(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String hostname = prefs.getString(HOSTNAME_PREF, "");
         String port = prefs.getString(PORT_PREF, "");
         String apikey = prefs.getString(APIKEY_PREF, "");
 
-        if (hostname == null ||  hostname.equals("")
-                || port == null || port.equals("")
-                || apikey == null || apikey.equals("")) {
-            showConnectionErrorAlert(context);
-            return null;
-        } else {
-            return prefs;
-        }
+        return hostname != null && !hostname.equals("")
+                && port != null && !port.equals("")
+                && apikey != null && !apikey.equals("");
     }
 
     public void handleJsonException(Context context, String originalJsonString, JSONException exception) {
@@ -48,5 +52,9 @@ public class ContextHelper {
         builder.setMessage(message)
                 .setNeutralButton("Ok", null)
                 .show();
+    }
+
+    public void showConnectionTimeoutAlert(Context context) {
+        showErrorAlert(context, "Connection Timeout. Please try again later");
     }
 }

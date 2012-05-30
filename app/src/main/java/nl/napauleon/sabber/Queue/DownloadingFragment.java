@@ -82,14 +82,12 @@ public class DownloadingFragment extends SherlockListFragment {
                                 queue.getString("speed"), queue.getString("eta"));
                     } catch (JSONException e) {
                         new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
-                    } finally {
-                        getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
                     }
                     break;
                 default:
-                    getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
                     super.handleMessage(msg);
             }
+            getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
         }
 
         private List<QueueInfo> retrieveQueueItems(JSONObject queue) throws JSONException {

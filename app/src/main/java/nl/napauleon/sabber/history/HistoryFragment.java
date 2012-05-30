@@ -65,13 +65,12 @@ public class HistoryFragment extends SherlockListFragment {
                         setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
                     } catch (JSONException e) {
                         new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
-                    } finally {
-                        getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
                     }
                     break;
                 default:
                     super.handleMessage(msg);
             }
+            getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
         }
     }
 }

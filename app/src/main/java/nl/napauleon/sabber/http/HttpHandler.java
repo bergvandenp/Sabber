@@ -16,6 +16,9 @@ public class HttpHandler extends Handler {
     @Override
     public void handleMessage(Message msg) {
         switch (msg.what) {
+            case HttpGetTask.MSG_CONNECTIONTIMEOUT:
+                new ContextHelper().showConnectionTimeoutAlert(context);
+                break;
             case HttpGetTask.MSG_CONNECTIONERROR:
                 new ContextHelper().showConnectionErrorAlert(context);
                 break;

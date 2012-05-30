@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -19,6 +20,7 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
 
     public static final int MSG_RESULT = 1;
     public static final int MSG_CONNECTIONERROR = 2;
+    public static final int MSG_CONNECTIONTIMEOUT = 3;
 
     private static final String TAG = "HttpGetTask";
 
@@ -41,8 +43,12 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
             HttpResponse response = new DefaultHttpClient(httpParameters).execute(new HttpGet(strings[0]));
             content = response.getEntity().getContent();
+        } catch (ConnectTimeoutException e) {
+            Log.e(TAG, "Network exception", e);
+            handler.sendMessage(handler.obtainMessage(MSG_CONNECTIONTIMEOUT));
         } catch (Exception e) {
             Log.e(TAG, "Network exception", e);
+            handler.sendMessage(handler.obtainMessage(MSG_CONNECTIONERROR));
         }
         if(content != null) {
         	return (inputStreamToString(content)).toString();
@@ -53,14 +59,11 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
 	
 	@Override
     public void onPostExecute(String result) {
-    	if(result == null) {
-        	Log.e(TAG, "no result available");
-            handler.sendMessage(handler.obtainMessage(MSG_CONNECTIONERROR, result));
-    		return;
-        }
 		try {
             Log.i(TAG, "Http result: " + result);
-            handler.sendMessage(handler.obtainMessage(MSG_RESULT, result));
+            if(result != null) {
+                handler.sendMessage(handler.obtainMessage(MSG_RESULT, result));
+            }
 		} catch (ClassCastException e) {
             Log.e(TAG, "No valid response from the downloadserver", e);
 		}

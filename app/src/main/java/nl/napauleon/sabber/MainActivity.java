@@ -18,6 +18,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
     private static final String TAG_HISTORY_TAB = "history";
     private static final String TAG_DOWNLOADING_TAB = "downloading";
+    private static final String SELECTED_TAB_PREF = "selectedTab";
     private TabListener<DownloadingFragment> downloadingListener;
     private TabListener<HistoryFragment> historyListener;
     private boolean paused = false;
@@ -32,14 +33,31 @@ public class MainActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         setSupportProgressBarIndeterminateVisibility(false);
+        if (!new ContextHelper().isSabnzbSettingsPresent(this)) {
+            Intent settingsActivity = new Intent(getBaseContext(), Settings.class);
+            startActivity(settingsActivity);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         initializeTabs();
     }
 
-	private void initializeTabs() {
-		ActionBar actionBar = getSupportActionBar();
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        ActionBar actionBar = getSupportActionBar();
+        ActionBar.Tab tab = actionBar.getTabAt(savedInstanceState.getInt(SELECTED_TAB_PREF, 0));
+        actionBar.selectTab(tab);
+    }
+
+    private void initializeTabs() {
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
-
         downloadingListener = new TabListener<DownloadingFragment>(
                 this, "downloading", DownloadingFragment.class);
         actionBar.addTab(actionBar.newTab()
@@ -53,7 +71,17 @@ public class MainActivity extends SherlockFragmentActivity {
                 .setText(R.string.history)
                 .setTabListener(historyListener)
                 .setTag(TAG_HISTORY_TAB));
-	}
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        ActionBar.Tab selectedTab = getSupportActionBar().getSelectedTab();
+        if(selectedTab != null) {
+            outState.putInt(SELECTED_TAB_PREF, selectedTab.getPosition());
+        }
+        getSupportActionBar().removeAllTabs();
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -67,7 +95,7 @@ public class MainActivity extends SherlockFragmentActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem menuItem = menu.findItem(R.id.menu_pause);
         if (menuItem != null) {
-            if(paused) {
+            if (paused) {
                 menuItem.setIcon(R.drawable.ic_play);
                 menuItem.setTitle(R.string.menu_play);
             } else {
@@ -78,7 +106,7 @@ public class MainActivity extends SherlockFragmentActivity {
         }
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -92,9 +120,9 @@ public class MainActivity extends SherlockFragmentActivity {
                 return true;
             case R.id.menu_refresh:
                 Object tag = getSupportActionBar().getSelectedTab().getTag();
-                if(tag.equals(TAG_DOWNLOADING_TAB)) {
+                if (tag.equals(TAG_DOWNLOADING_TAB)) {
                     downloadingListener.mFragment.onResume();
-                } else if(tag.equals(TAG_HISTORY_TAB)) {
+                } else if (tag.equals(TAG_HISTORY_TAB)) {
                     historyListener.mFragment.onResume();
                 }
                 return true;
@@ -109,9 +137,9 @@ public class MainActivity extends SherlockFragmentActivity {
     private void togglePauseSabnzb() {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(this);
         if (preferences != null) {
-            if(paused) {
+            if (paused) {
                 new HttpGetTask(new PauseToggleHandler()).execute(createResumeConnection(preferences));
-            }else {
+            } else {
                 new HttpGetTask(new PauseToggleHandler()).execute(createPauseConnection(preferences));
             }
         }
