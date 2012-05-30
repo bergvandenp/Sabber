@@ -15,10 +15,15 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
 
         Preference hostnamePref = getPreferenceScreen().findPreference("hostnamePref");
         Preference portPref = getPreferenceScreen().findPreference("portPref");
+        Preference apikeyPref = getPreferenceScreen().findPreference("apikeyPref");
+        Preference minsizePref = getPreferenceScreen().findPreference("minsizePref");
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         hostnamePref.setSummary(sharedPreferences.getString("hostnamePref", ""));
         portPref.setSummary(sharedPreferences.getString("portPref", ""));
+        apikeyPref.setSummary(sharedPreferences.getString("apikeyPref", ""));
+        minsizePref.setSummary(sharedPreferences.getString("minsizePref", ""));
+
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
