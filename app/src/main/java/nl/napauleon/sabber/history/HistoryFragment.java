@@ -6,6 +6,7 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
@@ -19,6 +20,8 @@ import org.json.JSONTokener;
 import java.util.ArrayList;
 
 public class HistoryFragment extends SherlockListFragment {
+
+    private ArrayList<HistoryInfo> historyItems;
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,12 +39,16 @@ public class HistoryFragment extends SherlockListFragment {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if(preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            new HttpGetTask(new HistoryHandler()).execute(String.format("http://%s:%s/api?mode=history&limit=100&output=json&apikey=%s",
-                    preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                    preferences.getString(ContextHelper.PORT_PREF, ""),
-                    preferences.getString(ContextHelper.APIKEY_PREF, "")));
+            new HttpGetTask(new HistoryHandler()).execute(createHistoryConnectionString(preferences));
         }
 	}
+
+    String createHistoryConnectionString(SharedPreferences preferences) {
+        return String.format("http://%s:%s/api?mode=history&limit=100&output=json&apikey=%s",
+                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
+                preferences.getString(ContextHelper.PORT_PREF, ""),
+                preferences.getString(ContextHelper.APIKEY_PREF, ""));
+    }
 
     class HistoryHandler extends HttpHandler {
         public HistoryHandler() {
@@ -55,12 +62,13 @@ public class HistoryFragment extends SherlockListFragment {
                     try {
                         JSONArray slots = ((JSONObject) new JSONTokener((String) msg.obj).nextValue())
                                 .getJSONObject("history").getJSONArray("slots");
-                        ArrayList<HistoryInfo> historyItems = new ArrayList<HistoryInfo>(slots.length());
+                        historyItems = new ArrayList<HistoryInfo>(slots.length());
                         for(int i=0; i<slots.length(); i++) {
                             JSONObject slot = slots.getJSONObject(i);
+
                             historyItems.add(new HistoryInfo(
                                     slot.getString("nzb_name").replace(".nzb", ""),
-                                    slot.getLong("completed")));
+                                    slot.getLong("completed"), CompletedStatus.Succes));
                         }
                         setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
                     } catch (JSONException e) {
@@ -70,7 +78,19 @@ public class HistoryFragment extends SherlockListFragment {
                 default:
                     super.handleMessage(msg);
             }
-            getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
+            stopSpinner();
         }
+    }
+
+    private void stopSpinner() {
+        SherlockFragmentActivity sherlockActivity = getSherlockActivity();
+        if(sherlockActivity != null) {
+            sherlockActivity.setSupportProgressBarIndeterminateVisibility(false);
+        }
+    }
+
+    //for test purposes
+    public ArrayList<HistoryInfo> getHistoryItems() {
+        return new ArrayList<HistoryInfo>(historyItems);
     }
 }

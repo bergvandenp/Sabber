@@ -35,6 +35,12 @@ public class SearchableActivity extends ListActivity{
 
     private ProgressDialog dialog;
     private static final String ENCODING = "UTF-8";
+
+    //for test purposes
+    List<NzbInfo> getResults() {
+        return results;
+    }
+
     private final List<NzbInfo> results = new ArrayList<NzbInfo>();
 
     @Override

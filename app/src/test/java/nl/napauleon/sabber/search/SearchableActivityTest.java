@@ -1,11 +1,18 @@
 package nl.napauleon.sabber.search;
 
+import android.os.Message;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
+import nl.napauleon.sabber.http.HttpGetTask;
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
 import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class SearchableActivityTest {
@@ -20,11 +27,15 @@ public class SearchableActivityTest {
 	
 	@Test
 	public void testProcessResult() throws IOException {
-//		SearchNzbsTask searchNzbsTask = activity.new SearchNzbsTask();
-//		File file = FileUtils.toFile(ClassLoader.getSystemClassLoader().getResource("searchresult.xml"));
-//		String searchresult = FileUtils.readFileToString(file);
-//		searchNzbsTask.processResult(searchresult);
-//		System.out.println(activity.getResults().get(0).getTitle());
+        SearchableActivity.SearchHandler searchHandler = activity.new SearchHandler();
+        File file = FileUtils.toFile(ClassLoader.getSystemClassLoader().getResource("searchresult.xml"));
+        Message message = new Message();
+        message.what = HttpGetTask.MSG_RESULT;
+        message.obj = FileUtils.readFileToString(file);
+        searchHandler.handleMessage(message);
+
+        assertEquals(4, activity.getResults().size());
+		assertTrue(activity.getResults().get(0).getTitle().startsWith("<kere.ws> - TV - 1334088173 -"));
 	}
 	
 }

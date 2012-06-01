@@ -30,6 +30,11 @@ public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
 		HistoryInfo historyInfo = content.get(position);
 		textView.setText(historyInfo.getItem());
 		dateView.setText(historyInfo.getDateDownloaded());
+
+        if(historyInfo.getStatus() == CompletedStatus.Failed) {
+            textView.setTextColor(android.R.color.holo_red_light);
+            dateView.setTextColor(android.R.color.holo_red_light);
+        }
 		return rowView;
 	}
 

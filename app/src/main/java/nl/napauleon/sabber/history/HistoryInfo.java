@@ -6,10 +6,12 @@ import java.util.Date;
 public class HistoryInfo {
 	private String item;
 	private Long dateDownloaded;
+    private CompletedStatus status;
 	
-	public HistoryInfo(String item, Long dateDownloaded) {
+	public HistoryInfo(String item, Long dateDownloaded, CompletedStatus status) {
 		this.item = item;
 		this.dateDownloaded = dateDownloaded;
+        this.status = status;
 	}
 	
 	public String getDateDownloaded() {
@@ -19,4 +21,8 @@ public class HistoryInfo {
 	public String getItem() {
 		return item;
 	}
+
+    public CompletedStatus getStatus() {
+        return status;
+    }
 }

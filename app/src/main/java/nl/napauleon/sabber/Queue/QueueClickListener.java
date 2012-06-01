@@ -1,10 +1,9 @@
-package nl.napauleon.sabber.Queue;
+package nl.napauleon.sabber.queue;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,19 +17,12 @@ import java.util.List;
 
 public class QueueClickListener implements AdapterView.OnItemClickListener {
 
-    private Fragment fragment;
-    private final List<QueueInfo> queueItems;
+    private List<QueueInfo> queueItems;
     private List<String> categories;
-
-    public QueueClickListener(Fragment fragment, List<QueueInfo> queueItems, List<String> categories) {
-        this.fragment = fragment;
-        this.queueItems = queueItems;
-        this.categories = categories;
-    }
 
     public void onItemClick(final AdapterView<?> adapterView, View view, int i, long l) {
         final QueueInfo queueInfo = queueItems.get((int) l);
-        Context context = adapterView.getContext();
+        final Context context = adapterView.getContext();
         final SharedPreferences preferences = new ContextHelper().checkAndGetSettings(context);
         if (preferences != null) {
             final AlertDialog.Builder categoryAlert = new AlertDialog.Builder(context)
@@ -38,7 +30,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener {
                     .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    new HttpGetTask(new RefreshHandler(fragment))
+                                    new HttpGetTask(new RefreshHandler(context))
                                             .execute(createConnectionChangeCategory(preferences, queueInfo.getId(), categories.get(i)));
                                 }
                             });
@@ -49,7 +41,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener {
                     .setPositiveButton(context.getString(R.string.option_positive),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    new HttpGetTask(new RefreshHandler(fragment))
+                                    new HttpGetTask(new RefreshHandler(context))
                                             .execute(createConnectionDeleteItem(preferences, queueInfo.getId()));
                                 }
                             })
@@ -104,5 +96,13 @@ public class QueueClickListener implements AdapterView.OnItemClickListener {
                 preferences.getString(ContextHelper.PORT_PREF, ""),
                 itemId, category,
                 preferences.getString(ContextHelper.APIKEY_PREF, ""));
+    }
+
+    public void setQueueItems(List<QueueInfo> queueItems) {
+        this.queueItems = queueItems;
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
 }

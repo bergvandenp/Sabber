@@ -1,4 +1,4 @@
-package nl.napauleon.sabber.Queue;
+package nl.napauleon.sabber.queue;
 
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
@@ -25,6 +26,20 @@ import java.util.List;
 public class DownloadingFragment extends SherlockListFragment {
 
     private TextView timeLeftView, speedView, sizeView, etaView;
+    private QueueClickListener itemClickListener;
+
+    //for test purposes
+    public List<QueueInfo> getQueueItems() {
+        return new ArrayList<QueueInfo>(queueItems);
+    }
+
+    private List<QueueInfo> queueItems;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        itemClickListener = new QueueClickListener();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,6 +53,12 @@ public class DownloadingFragment extends SherlockListFragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        getListView().setOnItemClickListener(itemClickListener);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         retrieveQueueData();
@@ -48,13 +69,17 @@ public class DownloadingFragment extends SherlockListFragment {
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
             new HttpGetTask(new DownloadingHandler()).execute(
-                    String.format("http://%s:%s/api?mode=queue&output=json&apikey=%s",
-                            preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                            preferences.getString(ContextHelper.PORT_PREF, ""),
-                            preferences.getString(ContextHelper.APIKEY_PREF, "")
-                    )
+                    createQueueConnectionString(preferences)
             );
         }
+    }
+
+    String createQueueConnectionString(SharedPreferences preferences) {
+        return String.format("http://%s:%s/api?mode=queue&output=json&apikey=%s",
+                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
+                preferences.getString(ContextHelper.PORT_PREF, ""),
+                preferences.getString(ContextHelper.APIKEY_PREF, "")
+        );
     }
 
     class DownloadingHandler extends HttpHandler {
@@ -73,10 +98,10 @@ public class DownloadingFragment extends SherlockListFragment {
 
                         togglePause(queue);
 
-                        List<QueueInfo> queueItems = retrieveQueueItems(queue);
+                        queueItems = extractQueueItems(queue);
                         setListAdapter(new QueueListAdapter(getActivity(), queueItems));
-                        getListView().setOnItemClickListener(new QueueClickListener(DownloadingFragment.this,
-                                queueItems, retrieveCategories(queue.getJSONArray("categories"))));
+                        itemClickListener.setCategories(retrieveCategories(queue.getJSONArray("categories")));
+                        itemClickListener.setQueueItems(queueItems);
 
                         populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
                                 queue.getString("speed"), queue.getString("eta"));
@@ -87,10 +112,10 @@ public class DownloadingFragment extends SherlockListFragment {
                 default:
                     super.handleMessage(msg);
             }
-            getSherlockActivity().setSupportProgressBarIndeterminateVisibility(false);
+            stopSpinner();
         }
 
-        private List<QueueInfo> retrieveQueueItems(JSONObject queue) throws JSONException {
+        private List<QueueInfo> extractQueueItems(JSONObject queue) throws JSONException {
             JSONArray slots = queue.getJSONArray("slots");
             List<QueueInfo> queueItems = new ArrayList<QueueInfo>(slots.length());
             for (int i = 0; i < slots.length(); i++) {
@@ -119,6 +144,13 @@ public class DownloadingFragment extends SherlockListFragment {
                     getActivity().invalidateOptionsMenu();
                 }
             }
+        }
+    }
+
+    private void stopSpinner() {
+        SherlockFragmentActivity sherlockActivity = getSherlockActivity();
+        if (sherlockActivity != null) {
+            sherlockActivity.setSupportProgressBarIndeterminateVisibility(false);
         }
     }
 

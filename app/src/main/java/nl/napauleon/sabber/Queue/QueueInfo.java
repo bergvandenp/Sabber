@@ -1,4 +1,4 @@
-package nl.napauleon.sabber.Queue;
+package nl.napauleon.sabber.queue;
 
 public class QueueInfo {
 

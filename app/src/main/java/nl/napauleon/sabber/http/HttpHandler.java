@@ -7,7 +7,7 @@ import nl.napauleon.sabber.ContextHelper;
 
 public class HttpHandler extends Handler {
 
-    private Context context;
+    protected Context context;
 
     public HttpHandler(Context context) {
         this.context = context;

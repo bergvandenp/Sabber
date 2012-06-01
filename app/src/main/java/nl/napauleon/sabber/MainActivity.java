@@ -9,7 +9,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import nl.napauleon.sabber.Queue.DownloadingFragment;
+import nl.napauleon.sabber.queue.DownloadingFragment;
 import nl.napauleon.sabber.history.HistoryFragment;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.HttpHandler;
@@ -48,7 +48,7 @@ public class MainActivity extends SherlockFragmentActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
+        initializeTabs();
         ActionBar actionBar = getSupportActionBar();
         ActionBar.Tab tab = actionBar.getTabAt(savedInstanceState.getInt(SELECTED_TAB_PREF, 0));
         actionBar.selectTab(tab);
@@ -58,19 +58,21 @@ public class MainActivity extends SherlockFragmentActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
-        downloadingListener = new TabListener<DownloadingFragment>(
-                this, "downloading", DownloadingFragment.class);
-        actionBar.addTab(actionBar.newTab()
-                .setText(R.string.downloading)
-                .setTabListener(downloadingListener)
-                .setTag("downloading"));
+        if(actionBar.getTabCount() == 0) {
+            downloadingListener = new TabListener<DownloadingFragment>(
+                    this, "downloading", DownloadingFragment.class);
+            actionBar.addTab(actionBar.newTab()
+                    .setText(R.string.downloading)
+                    .setTabListener(downloadingListener)
+                    .setTag("downloading"));
 
-        historyListener = new TabListener<HistoryFragment>(
-                this, "history", HistoryFragment.class);
-        actionBar.addTab(actionBar.newTab()
-                .setText(R.string.history)
-                .setTabListener(historyListener)
-                .setTag(TAG_HISTORY_TAB));
+            historyListener = new TabListener<HistoryFragment>(
+                    this, "history", HistoryFragment.class);
+            actionBar.addTab(actionBar.newTab()
+                    .setText(R.string.history)
+                    .setTabListener(historyListener)
+                    .setTag(TAG_HISTORY_TAB));
+        }
     }
 
     @Override
