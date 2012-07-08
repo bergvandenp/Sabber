@@ -39,7 +39,14 @@ public class HistoryFragment extends SherlockListFragment {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if(preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            new HttpGetTask(new HistoryHandler()).execute(createHistoryConnectionString(preferences));
+            //new HttpGetTask(new HistoryHandler()).execute(createHistoryConnectionString(preferences));
+            historyItems = new ArrayList<HistoryInfo>();
+            historyItems.add(new HistoryInfo(
+                    "test",
+                    System.currentTimeMillis(),
+                    Status.Repairing,
+                    "Repairing: 80%"));
+            setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
         }
 	}
 
@@ -66,9 +73,12 @@ public class HistoryFragment extends SherlockListFragment {
                         for(int i=0; i<slots.length(); i++) {
                             JSONObject slot = slots.getJSONObject(i);
 
+                            Status status = Status.valueOf(slot.getString("status"));
                             historyItems.add(new HistoryInfo(
                                     slot.getString("nzb_name").replace(".nzb", ""),
-                                    slot.getLong("completed"), CompletedStatus.Succes));
+                                    slot.getLong("completed"),
+                                    status,
+                                    status == Status.Failed ? slot.getString("fail_message") : slot.getString("action_line")));
                         }
                         setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
                     } catch (JSONException e) {

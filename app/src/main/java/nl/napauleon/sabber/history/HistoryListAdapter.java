@@ -27,13 +27,16 @@ public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
 		View rowView = inflater.inflate(R.layout.historyrowlayout, null, true);
 		TextView textView = (TextView) rowView.findViewById(R.id.itemname);
 		TextView dateView = (TextView) rowView.findViewById(R.id.itemdate);
-		HistoryInfo historyInfo = content.get(position);
-		textView.setText(historyInfo.getItem());
-		dateView.setText(historyInfo.getDateDownloaded());
+        TextView actionlineView = (TextView) rowView.findViewById(R.id.actionline);
 
-        if(historyInfo.getStatus() == CompletedStatus.Failed) {
-            textView.setTextColor(android.R.color.holo_red_light);
-            dateView.setTextColor(android.R.color.holo_red_light);
+        HistoryInfo historyInfo = content.get(position);
+
+        textView.setText(historyInfo.getItem());
+		dateView.setText(historyInfo.getDateDownloaded());
+        actionlineView.setText(historyInfo.getMessage());
+
+        if(historyInfo.getStatus() != Status.Completed) {
+            actionlineView.setTextColor(inflater.getContext().getResources().getColor(R.color.blue));
         }
 		return rowView;
 	}
