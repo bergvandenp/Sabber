@@ -39,14 +39,7 @@ public class HistoryFragment extends SherlockListFragment {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if(preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            //new HttpGetTask(new HistoryHandler()).execute(createHistoryConnectionString(preferences));
-            historyItems = new ArrayList<HistoryInfo>();
-            historyItems.add(new HistoryInfo(
-                    "test",
-                    System.currentTimeMillis(),
-                    Status.Repairing,
-                    "Repairing: 80%"));
-            setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
+            new HttpGetTask(new HistoryHandler()).execute(createHistoryConnectionString(preferences));
         }
 	}
 

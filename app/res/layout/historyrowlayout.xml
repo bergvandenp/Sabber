@@ -23,10 +23,12 @@
         </TextView>
     </TableRow>
     <TableRow>
-        <TextView android:id="@+id/actionline"
+        <TextView android:id="@+id/message"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:padding="5dp"
+                  android:textColor="@color/red"
+                  android:textStyle="bold"
                   style="@style/CodeFont"/>
     </TableRow>
 
