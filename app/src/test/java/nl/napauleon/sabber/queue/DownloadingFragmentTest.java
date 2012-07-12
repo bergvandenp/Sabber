@@ -30,7 +30,7 @@ public class DownloadingFragmentTest {
     public void testHandleQueueResult() throws Exception {
         Message message = Utils.createResultMessage("queueresult");
 
-        fragment.new DownloadingHandler().handleMessage(message);
+//        fragment.new DownloadingCallback().handleMessage(message);
 
         List<QueueInfo> result = fragment.getQueueItems();
         assertEquals(1, result.size());

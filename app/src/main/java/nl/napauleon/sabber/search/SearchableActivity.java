@@ -5,13 +5,13 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.HttpHandler;
+import nl.napauleon.sabber.http.HttpGetHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,13 +28,14 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchableActivity extends ListActivity{
+public class SearchableActivity extends ListActivity implements Handler.Callback {
 
     private static final String MINSIZE_PREF = "minsizePref";
     private static final String TAG = "SearchableActivity";
+    private static final String ENCODING = "UTF-8";
 
     private ProgressDialog dialog;
-    private static final String ENCODING = "UTF-8";
+    private HttpGetHandler httpHandler;
 
     //for test purposes
     List<NzbInfo> getResults() {
@@ -46,10 +47,11 @@ public class SearchableActivity extends ListActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        httpHandler = new HttpGetHandler(this);
         setContentView(R.layout.itemlist);
         Intent intent = getIntent();
-        if(intent != null) {
-        	handleIntent(intent);
+        if (intent != null) {
+            handleIntent(intent);
         }
     }
 
@@ -70,7 +72,7 @@ public class SearchableActivity extends ListActivity{
         dialog = ProgressDialog.show(this, "", getString(R.string.title_loading), true);
         String searchString = createSearchString(query);
         Log.i(TAG, "searching with url: " + searchString);
-        new HttpGetTask(new SearchHandler()).execute(searchString);
+        httpHandler.sendMessage(httpHandler.obtainMessage(HttpGetHandler.MSG_REQUEST, searchString));
     }
 
     private String createSearchString(String query) {
@@ -80,66 +82,58 @@ public class SearchableActivity extends ListActivity{
                     URLEncoder.encode(query, ENCODING),
                     minsize);
         } catch (UnsupportedEncodingException e) {
-                Log.e(TAG, "Unsupported encoding: " + ENCODING, e);
+            Log.e(TAG, "Unsupported encoding: " + ENCODING, e);
             return null;
         }
     }
 
-    class SearchHandler extends HttpHandler {
-        public SearchHandler() {
-            super(SearchableActivity.this);
-        }
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case HttpGetHandler.MSG_RESULT:
+                results.clear();
 
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case HttpGetTask.MSG_RESULT:
-                    results.clear();
-
-                    Document document = XMLfromString((String) msg.obj);
-                    NodeList nodeList = document.getElementsByTagName("item");
-                    for (int i = 0; i < nodeList.getLength(); i++) {
-                        Element item = (Element) nodeList.item(i);
-                        NodeList childNodes = item.getElementsByTagName("title").item(0).getChildNodes();
-                        String title = "";
-                        for(int j=0; j<childNodes.getLength(); j++){
-                            Node childNode = childNodes.item(j);
-                            title = title + childNode.getNodeValue();
-                        }
-                        Element enclosure = (Element) item.getElementsByTagName("enclosure").item(0);
-                        String link = enclosure.getAttribute("url");
-                        Long size = new Long(enclosure.getAttribute("length")) / 1024 / 1024;
-                        results.add(new NzbInfo(title, link, size + "MB"));
+                Document document = XMLfromString((String) msg.obj);
+                NodeList nodeList = document.getElementsByTagName("item");
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Element item = (Element) nodeList.item(i);
+                    NodeList childNodes = item.getElementsByTagName("title").item(0).getChildNodes();
+                    String title = "";
+                    for (int j = 0; j < childNodes.getLength(); j++) {
+                        Node childNode = childNodes.item(j);
+                        title = title + childNode.getNodeValue();
                     }
-                    setListAdapter(new SearchListAdapter(SearchableActivity.this, results));
+                    Element enclosure = (Element) item.getElementsByTagName("enclosure").item(0);
+                    String link = enclosure.getAttribute("url");
+                    Long size = new Long(enclosure.getAttribute("length")) / 1024 / 1024;
+                    results.add(new NzbInfo(title, link, size + "MB"));
+                }
+                setListAdapter(new SearchListAdapter(SearchableActivity.this, results));
 
-                    if (dialog != null) {
-                        dialog.dismiss();
-                    }
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+                break;
+            default:
+                return false;
         }
-
-        private Document XMLfromString(String xml) {
-            try {
-                InputSource is = new InputSource();
-                is.setCharacterStream(new StringReader(xml));
-                return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
-            } catch (ParserConfigurationException e) {
-                Log.e(TAG, "error reading rss", e);
-                new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
-            } catch (SAXException e) {
-                Log.e(TAG, "error reading rss", e);
-                new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
-            } catch (IOException e) {
-                Log.e(TAG, "error reading rss", e);
-                new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
-            }
-            return null;
-        }
+        return true;
     }
 
-
+    private Document XMLfromString(String xml) {
+        try {
+            InputSource is = new InputSource();
+            is.setCharacterStream(new StringReader(xml));
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+        } catch (ParserConfigurationException e) {
+            Log.e(TAG, "error reading rss", e);
+            new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
+        } catch (SAXException e) {
+            Log.e(TAG, "error reading rss", e);
+            new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, "error reading rss", e);
+            new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
+        }
+        return null;
+    }
 }

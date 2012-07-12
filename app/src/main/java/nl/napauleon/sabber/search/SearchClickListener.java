@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.HttpGetHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -19,15 +19,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SearchClickListener implements AdapterView.OnItemClickListener {
+public class SearchClickListener implements AdapterView.OnItemClickListener, Handler.Callback {
 
     private static final String ENCODING = "UTF-8";
     private static final String TAG = "SearchClickListener";
 
     private final List<NzbInfo> results;
     private final Activity activity;
+    private HttpGetHandler httpTask;
 
     public SearchClickListener(Activity activity, List<NzbInfo> results) {
+        httpTask = new HttpGetHandler(this);
         this.activity = activity;
         this.results = results;
     }
@@ -63,8 +65,9 @@ public class SearchClickListener implements AdapterView.OnItemClickListener {
                             public void onClick(DialogInterface dialog, int id) {
                                 SharedPreferences preferences = new ContextHelper().checkAndGetSettings(parent.getContext());
                                 if (preferences != null) {
-                                    new HttpGetTask(new SearchHandler())
-                                            .execute(createConnectionString(preferences, results.get(position)));
+
+                                    String connectionString = createConnectionString(preferences, results.get(position));
+                                    httpTask.sendMessage(httpTask.obtainMessage(HttpGetHandler.MSG_REQUEST, connectionString));
                                 }
                             }
                         })
@@ -77,16 +80,14 @@ public class SearchClickListener implements AdapterView.OnItemClickListener {
                 .show();
     }
 
-    class SearchHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case HttpGetTask.MSG_RESULT:
-                    activity.finish();
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case HttpGetHandler.MSG_RESULT:
+                activity.finish();
+                break;
+            default:
+                return false;
         }
+        return true;
     }
 }

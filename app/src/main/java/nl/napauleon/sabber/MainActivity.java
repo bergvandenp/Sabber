@@ -3,18 +3,18 @@ package nl.napauleon.sabber;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import nl.napauleon.sabber.queue.DownloadingFragment;
 import nl.napauleon.sabber.history.HistoryFragment;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.HttpHandler;
+import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.queue.DownloadingFragment;
 
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends SherlockFragmentActivity implements Handler.Callback {
 
     private static final String TAG_HISTORY_TAB = "history";
     private static final String TAG_DOWNLOADING_TAB = "downloading";
@@ -58,7 +58,7 @@ public class MainActivity extends SherlockFragmentActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
-        if(actionBar.getTabCount() == 0) {
+        if (actionBar.getTabCount() == 0) {
             downloadingListener = new TabListener<DownloadingFragment>(
                     this, "downloading", DownloadingFragment.class);
             actionBar.addTab(actionBar.newTab()
@@ -78,7 +78,7 @@ public class MainActivity extends SherlockFragmentActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         ActionBar.Tab selectedTab = getSupportActionBar().getSelectedTab();
-        if(selectedTab != null) {
+        if (selectedTab != null) {
             outState.putInt(SELECTED_TAB_PREF, selectedTab.getPosition());
         }
         getSupportActionBar().removeAllTabs();
@@ -139,11 +139,13 @@ public class MainActivity extends SherlockFragmentActivity {
     private void togglePauseSabnzb() {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(this);
         if (preferences != null) {
+            Message message = Message.obtain();
             if (paused) {
-                new HttpGetTask(new PauseToggleHandler()).execute(createResumeConnection(preferences));
+                message.obj = createResumeConnection(preferences);
             } else {
-                new HttpGetTask(new PauseToggleHandler()).execute(createPauseConnection(preferences));
+                message.obj = createPauseConnection(preferences);
             }
+            new HttpGetHandler(this).sendMessage(message);
         }
     }
 
@@ -161,21 +163,21 @@ public class MainActivity extends SherlockFragmentActivity {
                 preferences.getString(ContextHelper.APIKEY_PREF, ""));
     }
 
-    private class PauseToggleHandler extends HttpHandler {
-        public PauseToggleHandler() {
-            super(MainActivity.this);
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case HttpGetHandler.MSG_RESULT:
+                paused = !paused;
+                invalidateOptionsMenu();
+                break;
+            case HttpGetHandler.MSG_CONNECTIONTIMEOUT:
+                new ContextHelper().showConnectionTimeoutAlert(this);
+                break;
+            case HttpGetHandler.MSG_CONNECTIONERROR:
+                new ContextHelper().showConnectionErrorAlert(this);
+                break;
+            default:
+                return false;
         }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case HttpGetTask.MSG_RESULT:
-                    paused = !paused;
-                    invalidateOptionsMenu();
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
+        return true;
     }
 }

@@ -18,10 +18,6 @@ import java.io.InputStreamReader;
 
 public class HttpGetTask extends AsyncTask<String, Void, String> {
 
-    public static final int MSG_RESULT = 1;
-    public static final int MSG_CONNECTIONERROR = 2;
-    public static final int MSG_CONNECTIONTIMEOUT = 3;
-
     private static final String TAG = "HttpGetTask";
 
     private Handler handler;
@@ -45,10 +41,10 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             content = response.getEntity().getContent();
         } catch (ConnectTimeoutException e) {
             Log.e(TAG, "Network exception", e);
-            handler.sendMessage(handler.obtainMessage(MSG_CONNECTIONTIMEOUT));
+            handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONTIMEOUT));
         } catch (Exception e) {
             Log.e(TAG, "Network exception", e);
-            handler.sendMessage(handler.obtainMessage(MSG_CONNECTIONERROR));
+            handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONERROR));
         }
         if(content != null) {
         	return (inputStreamToString(content)).toString();
@@ -62,7 +58,7 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
 		try {
             Log.i(TAG, "Http result: " + result);
             if(result != null) {
-                handler.sendMessage(handler.obtainMessage(MSG_RESULT, result));
+                handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_RESULT, result));
             }
 		} catch (ClassCastException e) {
             Log.e(TAG, "No valid response from the downloadserver", e);

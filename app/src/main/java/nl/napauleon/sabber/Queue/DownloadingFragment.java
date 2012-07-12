@@ -3,6 +3,7 @@ package nl.napauleon.sabber.queue;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,7 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.HttpHandler;
+import nl.napauleon.sabber.http.HttpGetHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,10 +23,11 @@ import org.json.JSONTokener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadingFragment extends SherlockListFragment {
+public class DownloadingFragment extends SherlockListFragment{
 
     private TextView timeLeftView, speedView, sizeView, etaView;
     private QueueClickListener itemClickListener;
+    private HttpGetHandler httpHandler;
 
     //for test purposes
     public List<QueueInfo> getQueueItems() {
@@ -39,6 +40,7 @@ public class DownloadingFragment extends SherlockListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         itemClickListener = new QueueClickListener();
+        httpHandler = new HttpGetHandler(new DownloadingCallback());
     }
 
     @Override
@@ -68,9 +70,12 @@ public class DownloadingFragment extends SherlockListFragment {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            new HttpGetTask(new DownloadingHandler()).execute(
+            Message message = Message.obtain();
+            message.obj = createQueueConnectionString(preferences);
+            httpHandler.sendMessage(httpHandler.obtainMessage(
+                    HttpGetHandler.MSG_REQUEST,
                     createQueueConnectionString(preferences)
-            );
+            ));
         }
     }
 
@@ -82,67 +87,64 @@ public class DownloadingFragment extends SherlockListFragment {
         );
     }
 
-    class DownloadingHandler extends HttpHandler {
+    private class DownloadingCallback implements Handler.Callback {
 
-        public DownloadingHandler() {
-            super(getActivity());
-        }
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case HttpGetHandler.MSG_RESULT:
+                try {
+                    JSONObject queue = ((JSONObject) new JSONTokener((String) msg.obj)
+                            .nextValue()).getJSONObject("queue");
 
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case HttpGetTask.MSG_RESULT:
-                    try {
-                        JSONObject queue = ((JSONObject) new JSONTokener((String) msg.obj)
-                                .nextValue()).getJSONObject("queue");
+                    togglePause(queue);
 
-                        togglePause(queue);
+                    queueItems = extractQueueItems(queue);
+                    setListAdapter(new QueueListAdapter(getActivity(), queueItems));
+                    itemClickListener.setCategories(retrieveCategories(queue.getJSONArray("categories")));
+                    itemClickListener.setQueueItems(queueItems);
 
-                        queueItems = extractQueueItems(queue);
-                        setListAdapter(new QueueListAdapter(getActivity(), queueItems));
-                        itemClickListener.setCategories(retrieveCategories(queue.getJSONArray("categories")));
-                        itemClickListener.setQueueItems(queueItems);
-
-                        populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
-                                queue.getString("speed"), queue.getString("eta"));
-                    } catch (JSONException e) {
-                        new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
-                    }
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-            stopSpinner();
-        }
-
-        private List<QueueInfo> extractQueueItems(JSONObject queue) throws JSONException {
-            JSONArray slots = queue.getJSONArray("slots");
-            List<QueueInfo> queueItems = new ArrayList<QueueInfo>(slots.length());
-            for (int i = 0; i < slots.length(); i++) {
-                JSONObject slot = slots.getJSONObject(i);
-                queueItems.add(new QueueInfo(
-                        slot.getString("nzo_id"),
-                        slot.getString("filename"),
-                        slot.getString("timeleft"),
-                        slot.getInt("percentage")));
-            }
-            return queueItems;
-        }
-
-        private List<String> retrieveCategories(JSONArray jsonCategories) throws JSONException {
-            List<String> categories = new ArrayList<String>(jsonCategories.length());
-            for (int i = 0; i < jsonCategories.length(); i++) {
-                categories.add(jsonCategories.getString(i));
-            }
-            return categories;
-        }
-
-        private void togglePause(JSONObject queue) throws JSONException {
-            if(getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).setPaused(queue.getBoolean("paused"));
-                if(Build.VERSION.SDK_INT >= 11) {
-                    getActivity().invalidateOptionsMenu();
+                    populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
+                            queue.getString("speed"), queue.getString("eta"));
+                } catch (JSONException e) {
+                    new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
                 }
+                break;
+            default:
+                // causes further message handling
+                return false;
+        }
+        stopSpinner();
+        return true;
+    }
+    }
+
+    private List<QueueInfo> extractQueueItems(JSONObject queue) throws JSONException {
+        JSONArray slots = queue.getJSONArray("slots");
+        List<QueueInfo> queueItems = new ArrayList<QueueInfo>(slots.length());
+        for (int i = 0; i < slots.length(); i++) {
+            JSONObject slot = slots.getJSONObject(i);
+            queueItems.add(new QueueInfo(
+                    slot.getString("nzo_id"),
+                    slot.getString("filename"),
+                    slot.getString("timeleft"),
+                    slot.getInt("percentage")));
+        }
+        return queueItems;
+    }
+
+    private List<String> retrieveCategories(JSONArray jsonCategories) throws JSONException {
+        List<String> categories = new ArrayList<String>(jsonCategories.length());
+        for (int i = 0; i < jsonCategories.length(); i++) {
+            categories.add(jsonCategories.getString(i));
+        }
+        return categories;
+    }
+
+    private void togglePause(JSONObject queue) throws JSONException {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).setPaused(queue.getBoolean("paused"));
+            if (Build.VERSION.SDK_INT >= 11) {
+                getActivity().invalidateOptionsMenu();
             }
         }
     }

@@ -27,7 +27,7 @@ public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
 		View rowView = inflater.inflate(R.layout.historyrowlayout, null, true);
 		TextView textView = (TextView) rowView.findViewById(R.id.itemname);
 		TextView dateView = (TextView) rowView.findViewById(R.id.itemdate);
-        TextView messageView = (TextView) rowView.findViewById(R.id.message);
+        TextView messageView = (TextView) rowView.findViewById(R.id.historymessage);
 
         HistoryInfo historyInfo = content.get(position);
 

@@ -26,5 +26,6 @@
         </activity>
 
         <meta-data android:name="android.app.default_searchable" android:value=".search.SearchableActivity"/>
+        <service android:enabled="true" android:name=".queue.QueueService"/>
     </application>
 </manifest>
