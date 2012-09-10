@@ -5,12 +5,12 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -28,7 +28,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchableActivity extends ListActivity implements Handler.Callback {
+public class SearchableActivity extends ListActivity{
 
     private static final String MINSIZE_PREF = "minsizePref";
     private static final String TAG = "SearchableActivity";
@@ -47,7 +47,7 @@ public class SearchableActivity extends ListActivity implements Handler.Callback
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        httpHandler = new HttpGetHandler(this);
+        httpHandler = new HttpGetHandler(new SearchCallback());
         setContentView(R.layout.itemlist);
         Intent intent = getIntent();
         if (intent != null) {
@@ -87,36 +87,43 @@ public class SearchableActivity extends ListActivity implements Handler.Callback
         }
     }
 
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case HttpGetHandler.MSG_RESULT:
-                results.clear();
-
-                Document document = XMLfromString((String) msg.obj);
-                NodeList nodeList = document.getElementsByTagName("item");
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Element item = (Element) nodeList.item(i);
-                    NodeList childNodes = item.getElementsByTagName("title").item(0).getChildNodes();
-                    String title = "";
-                    for (int j = 0; j < childNodes.getLength(); j++) {
-                        Node childNode = childNodes.item(j);
-                        title = title + childNode.getNodeValue();
-                    }
-                    Element enclosure = (Element) item.getElementsByTagName("enclosure").item(0);
-                    String link = enclosure.getAttribute("url");
-                    Long size = new Long(enclosure.getAttribute("length")) / 1024 / 1024;
-                    results.add(new NzbInfo(title, link, size + "MB"));
-                }
-                setListAdapter(new SearchListAdapter(SearchableActivity.this, results));
-
-                if (dialog != null) {
-                    dialog.dismiss();
-                }
-                break;
-            default:
-                return false;
+    private class SearchCallback extends DefaultErrorCallback {
+        private SearchCallback() {
+            super(SearchableActivity.this);
         }
-        return true;
+
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case HttpGetHandler.MSG_RESULT:
+                    results.clear();
+
+                    Document document = XMLfromString((String) msg.obj);
+                    NodeList nodeList = document.getElementsByTagName("item");
+                    for (int i = 0; i < nodeList.getLength(); i++) {
+                        Element item = (Element) nodeList.item(i);
+                        NodeList childNodes = item.getElementsByTagName("title").item(0).getChildNodes();
+                        String title = "";
+                        for (int j = 0; j < childNodes.getLength(); j++) {
+                            Node childNode = childNodes.item(j);
+                            title = title + childNode.getNodeValue();
+                        }
+                        Element enclosure = (Element) item.getElementsByTagName("enclosure").item(0);
+                        String link = enclosure.getAttribute("url");
+                        Long size = new Long(enclosure.getAttribute("length")) / 1024 / 1024;
+                        results.add(new NzbInfo(title, link, size + "MB"));
+                    }
+                    setListAdapter(new SearchListAdapter(SearchableActivity.this, results));
+
+                    if (dialog != null) {
+                        dialog.dismiss();
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
     }
 
     private Document XMLfromString(String xml) {

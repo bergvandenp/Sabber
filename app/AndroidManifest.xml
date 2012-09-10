@@ -15,7 +15,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:label="@string/set_preferences" android:name=".Settings">
+        <activity android:label="@string/settings" android:name=".Settings">
         </activity>
 
         <activity android:label="@string/search" android:launchMode="singleTop" android:name=".search.SearchableActivity">
@@ -26,6 +26,5 @@
         </activity>
 
         <meta-data android:name="android.app.default_searchable" android:value=".search.SearchableActivity"/>
-        <service android:enabled="true" android:name=".queue.QueueService"/>
     </application>
 </manifest>

@@ -4,13 +4,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
 
 import java.io.UnsupportedEncodingException;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SearchClickListener implements AdapterView.OnItemClickListener, Handler.Callback {
+public class SearchClickListener implements AdapterView.OnItemClickListener{
 
     private static final String ENCODING = "UTF-8";
     private static final String TAG = "SearchClickListener";
@@ -29,7 +29,7 @@ public class SearchClickListener implements AdapterView.OnItemClickListener, Han
     private HttpGetHandler httpTask;
 
     public SearchClickListener(Activity activity, List<NzbInfo> results) {
-        httpTask = new HttpGetHandler(this);
+        httpTask = new HttpGetHandler(new SearchClickCallback());
         this.activity = activity;
         this.results = results;
     }
@@ -80,14 +80,23 @@ public class SearchClickListener implements AdapterView.OnItemClickListener, Han
                 .show();
     }
 
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case HttpGetHandler.MSG_RESULT:
-                activity.finish();
-                break;
-            default:
-                return false;
+    private class SearchClickCallback extends DefaultErrorCallback {
+
+        private SearchClickCallback() {
+            super(SearchClickListener.this.activity);
         }
-        return true;
+
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case HttpGetHandler.MSG_RESULT:
+                    activity.finish();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
     }
 }

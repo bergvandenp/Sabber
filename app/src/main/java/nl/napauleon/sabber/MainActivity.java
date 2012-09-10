@@ -3,7 +3,6 @@ package nl.napauleon.sabber;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -11,10 +10,11 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import nl.napauleon.sabber.history.HistoryFragment;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
 import nl.napauleon.sabber.queue.DownloadingFragment;
 
-public class MainActivity extends SherlockFragmentActivity implements Handler.Callback {
+public class MainActivity extends SherlockFragmentActivity {
 
     private static final String TAG_HISTORY_TAB = "history";
     private static final String TAG_DOWNLOADING_TAB = "downloading";
@@ -22,6 +22,7 @@ public class MainActivity extends SherlockFragmentActivity implements Handler.Ca
     private TabListener<DownloadingFragment> downloadingListener;
     private TabListener<HistoryFragment> historyListener;
     private boolean paused = false;
+    private HttpGetHandler httpHandler;
 
     public void setPaused(boolean paused) {
         this.paused = paused;
@@ -29,6 +30,7 @@ public class MainActivity extends SherlockFragmentActivity implements Handler.Ca
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        httpHandler = new HttpGetHandler(new MainCallback());
         requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -139,13 +141,13 @@ public class MainActivity extends SherlockFragmentActivity implements Handler.Ca
     private void togglePauseSabnzb() {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(this);
         if (preferences != null) {
-            Message message = Message.obtain();
+            Message message = httpHandler.obtainMessage(HttpGetHandler.MSG_REQUEST);
             if (paused) {
                 message.obj = createResumeConnection(preferences);
             } else {
                 message.obj = createPauseConnection(preferences);
             }
-            new HttpGetHandler(this).sendMessage(message);
+            new HttpGetHandler(new MainCallback()).sendMessage(message);
         }
     }
 
@@ -163,21 +165,24 @@ public class MainActivity extends SherlockFragmentActivity implements Handler.Ca
                 preferences.getString(ContextHelper.APIKEY_PREF, ""));
     }
 
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case HttpGetHandler.MSG_RESULT:
-                paused = !paused;
-                invalidateOptionsMenu();
-                break;
-            case HttpGetHandler.MSG_CONNECTIONTIMEOUT:
-                new ContextHelper().showConnectionTimeoutAlert(this);
-                break;
-            case HttpGetHandler.MSG_CONNECTIONERROR:
-                new ContextHelper().showConnectionErrorAlert(this);
-                break;
-            default:
-                return false;
+    private class MainCallback extends DefaultErrorCallback {
+
+        private MainCallback() {
+            super(MainActivity.this);
         }
-        return true;
+
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case HttpGetHandler.MSG_RESULT:
+                    paused = !paused;
+                    invalidateOptionsMenu();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
     }
 }

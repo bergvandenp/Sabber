@@ -1,10 +1,10 @@
 package nl.napauleon.sabber;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,6 +13,7 @@ public class ContextHelper {
     public static final String HOSTNAME_PREF = "hostnamePref";
     public static final String PORT_PREF = "portPref";
     public static final String APIKEY_PREF = "apikeyPref";
+    public static final String REFRESHRATE_PREF = "refreshratePref";
     private static final String TAG = "Sabber";
 
     public SharedPreferences checkAndGetSettings(Context context) {
@@ -48,10 +49,7 @@ public class ContextHelper {
     }
 
     public void showErrorAlert(Context context, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage(message)
-                .setNeutralButton("Ok", null)
-                .show();
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     public void showConnectionTimeoutAlert(Context context) {

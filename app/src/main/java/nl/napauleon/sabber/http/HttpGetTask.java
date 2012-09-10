@@ -29,6 +29,7 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... strings) {
         InputStream content = null;
+        HttpResponse response = null;
         try {
             HttpParams httpParameters = new BasicHttpParams();
             // Set the timeout in milliseconds until a connection is established.
@@ -37,8 +38,14 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             // Set the default socket timeout (SO_TIMEOUT) in milliseconds which is the timeout for waiting for data.
             int timeoutSocket = 5000;
             HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-            HttpResponse response = new DefaultHttpClient(httpParameters).execute(new HttpGet(strings[0]));
+            response = new DefaultHttpClient(httpParameters).execute(new HttpGet(strings[0]));
             content = response.getEntity().getContent();
+            if(response.getStatusLine().getStatusCode() == 200 && content != null) {
+                return (inputStreamToString(content)).toString();
+            } else {
+                handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONERROR));
+            }
+
         } catch (ConnectTimeoutException e) {
             Log.e(TAG, "Network exception", e);
             handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONTIMEOUT));
@@ -46,14 +53,10 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             Log.e(TAG, "Network exception", e);
             handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONERROR));
         }
-        if(content != null) {
-        	return (inputStreamToString(content)).toString();
-        } else {
-        	return null;
-        }
+        return null;
     }
-	
-	@Override
+
+    @Override
     public void onPostExecute(String result) {
 		try {
             Log.i(TAG, "Http result: " + result);

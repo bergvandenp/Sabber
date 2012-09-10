@@ -22,8 +22,14 @@
             android:inputType="text"
             android:name="Apikey Preference"/>
     <EditTextPreference
-            android:summary="@string/min_size_sum"
-            android:title="@string/min_size"
+            android:summary="@string/pref_refresh_rate_summary"
+            android:title="@string/pref_refresh_rate_title"
+            android:key="refreshratePref"
+            android:inputType="number"
+            android:name="Refresh rate Preference"/>
+    <EditTextPreference
+            android:summary="@string/pref_min_size_summary"
+            android:title="@string/pref_min_size_title"
             android:key="minsizePref"
             android:inputType="number"
             android:name="Minimal size Preference"/>
