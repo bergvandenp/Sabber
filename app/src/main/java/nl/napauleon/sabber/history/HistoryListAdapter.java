@@ -1,6 +1,8 @@
 package nl.napauleon.sabber.history;
 
 import android.app.Activity;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import nl.napauleon.sabber.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
@@ -32,7 +37,13 @@ public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
         HistoryInfo historyInfo = content.get(position);
 
         textView.setText(historyInfo.getItem());
-		dateView.setText(historyInfo.getDateDownloaded());
+        try {
+            Date dateDownloaded = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(historyInfo.getDateDownloaded());
+            dateView.setText(DateUtils.getRelativeTimeSpanString(dateDownloaded.getTime()));
+        } catch (ParseException e) {
+            Log.w("Sabber", "couldnt parse date" + historyInfo.getDateDownloaded());
+            dateView.setText(historyInfo.getDateDownloaded());
+        }
         messageView.setText(historyInfo.getMessage());
 		return rowView;
 	}
