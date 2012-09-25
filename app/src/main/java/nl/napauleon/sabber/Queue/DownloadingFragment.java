@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
@@ -94,7 +93,7 @@ public class DownloadingFragment extends SherlockListFragment{
     public void retrieveQueueData() {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if (preferences != null) {
-            getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
+            ((MainActivity)getActivity()).startSpinner();
             Message message = Message.obtain();
             message.obj = createQueueConnectionString(preferences);
             httpHandler.sendMessage(httpHandler.obtainMessage(
@@ -138,7 +137,7 @@ public class DownloadingFragment extends SherlockListFragment{
                 // causes further message handling
                 return false;
         }
-        stopSpinner();
+        ((MainActivity)getActivity()).stopSpinner();
         return true;
     }
     }
@@ -171,13 +170,6 @@ public class DownloadingFragment extends SherlockListFragment{
             if (Build.VERSION.SDK_INT >= 11) {
                 getActivity().invalidateOptionsMenu();
             }
-        }
-    }
-
-    private void stopSpinner() {
-        SherlockFragmentActivity sherlockActivity = getSherlockActivity();
-        if (sherlockActivity != null) {
-            sherlockActivity.setSupportProgressBarIndeterminateVisibility(false);
         }
     }
 

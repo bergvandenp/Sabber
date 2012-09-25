@@ -23,6 +23,7 @@ public class MainActivity extends SherlockFragmentActivity {
     private TabListener<HistoryFragment> historyListener;
     private boolean paused = false;
     private HttpGetHandler httpHandler;
+    private Menu menu;
 
     public void setPaused(boolean paused) {
         this.paused = paused;
@@ -91,7 +92,7 @@ public class MainActivity extends SherlockFragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
-
+        this.menu = menu;
         return true;
     }
 
@@ -163,6 +164,20 @@ public class MainActivity extends SherlockFragmentActivity {
                 preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
                 preferences.getString(ContextHelper.PORT_PREF, ""),
                 preferences.getString(ContextHelper.APIKEY_PREF, ""));
+    }
+
+    public void startSpinner() {
+        setSupportProgressBarIndeterminateVisibility(true);
+        if (menu != null) {
+            menu.removeItem(R.id.menu_refresh);
+        }
+    }
+
+    public void stopSpinner() {
+        setSupportProgressBarIndeterminateVisibility(false);
+        if (menu != null) {
+            menu.add(R.id.menu_refresh);
+        }
     }
 
     private class MainCallback extends DefaultErrorCallback {
