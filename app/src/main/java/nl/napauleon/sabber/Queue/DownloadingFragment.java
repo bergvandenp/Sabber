@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +28,16 @@ public class DownloadingFragment extends SherlockListFragment{
 
     private TextView timeLeftView, speedView, sizeView, etaView;
     private QueueClickListener itemClickListener;
-    private HttpGetHandler httpHandler;
-
-    //for test purposes
-    public List<QueueInfo> getQueueItems() {
-        return new ArrayList<QueueInfo>(queueItems);
-    }
-
     private List<QueueInfo> queueItems;
+    private HttpGetHandler httpHandler;
+    private Handler backgroundHandler = new Handler();
+    private Runnable backgroundUpdater = new Runnable() {
+        public void run() {
+            retrieveQueueData();
+            backgroundHandler.postDelayed(this, refreshrate * 1000);
+        }
+    };
+    private int refreshrate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,9 +64,31 @@ public class DownloadingFragment extends SherlockListFragment{
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        retrieveQueueData();
+        refreshrate = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(ContextHelper.REFRESHRATE_PREF, "0"));
+        if (refreshrate > 0) {
+            backgroundHandler.postDelayed(backgroundUpdater, refreshrate * 1000);
+        } else {
+            retrieveQueueData();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        backgroundHandler.removeCallbacks(backgroundUpdater);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        backgroundHandler.removeCallbacks(backgroundUpdater);
     }
 
     public void retrieveQueueData() {
@@ -169,5 +194,10 @@ public class DownloadingFragment extends SherlockListFragment{
         if (etaView != null) {
             etaView.setText(eta);
         }
+    }
+
+    //for test purposes
+    public List<QueueInfo> getQueueItems() {
+        return new ArrayList<QueueInfo>(queueItems);
     }
 }
