@@ -150,21 +150,10 @@ public class DownloadingFragment extends SherlockListFragment {
 
                 populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
                         queue.getString("speed"), queue.getString("eta"));
-                showNotification();
             } catch (JSONException e) {
                 new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
             }
         }
-    }
-
-    private void showNotification() {
-        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent[] intents = {new Intent(getActivity(), HistoryFragment.class)};
-        PendingIntent contentIntent = PendingIntent.getActivities(getActivity(), 0, intents, PendingIntent.FLAG_CANCEL_CURRENT);
-        Notification notification = new Notification(R.drawable.ic_launcher, "test", System.currentTimeMillis());
-        notification.setLatestEventInfo(getActivity(), "testitel", "test", contentIntent);
-        notification.defaults = Notification.DEFAULT_ALL;
-        notificationManager.notify(66, notification);
     }
 
     private List<QueueInfo> extractQueueItems(JSONObject queue) throws JSONException {
