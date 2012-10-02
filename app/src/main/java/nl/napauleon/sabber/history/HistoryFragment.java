@@ -3,6 +3,7 @@ package nl.napauleon.sabber.history;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 
 public class HistoryFragment extends SherlockListFragment{
 
+    public static final String TAG = "HistoryFragment";
     private ArrayList<HistoryInfo> historyItems;
     private HttpGetHandler httpHandler;
 
@@ -46,10 +48,7 @@ public class HistoryFragment extends SherlockListFragment{
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            httpHandler.sendMessage(httpHandler.obtainMessage(
-                    HttpGetHandler.MSG_REQUEST,
-                    createHistoryConnectionString(preferences))
-            );
+            httpHandler.executeRequest(createHistoryConnectionString(preferences));
         }
     }
 
@@ -66,32 +65,44 @@ public class HistoryFragment extends SherlockListFragment{
         }
 
         public boolean handleMessage(Message msg) {
+            boolean messageHandled = super.handleMessage(msg);
+            if (messageHandled) {
+                stopSpinner();
+                return true;
+            }
             switch (msg.what) {
                 case HttpGetHandler.MSG_RESULT:
-                    try {
-                        JSONArray slots = ((JSONObject) new JSONTokener((String) msg.obj).nextValue())
-                                .getJSONObject("history").getJSONArray("slots");
-                        historyItems = new ArrayList<HistoryInfo>(slots.length());
-                        for (int i = 0; i < slots.length(); i++) {
-                            JSONObject slot = slots.getJSONObject(i);
-
-                            Status status = Status.valueOf(slot.getString("status"));
-                            historyItems.add(new HistoryInfo(
-                                    slot.getString("nzb_name").replace(".nzb", ""),
-                                    slot.getLong("completed"),
-                                    status,
-                                    status == Status.Failed ? slot.getString("fail_message") : slot.getString("action_line")));
-                        }
-                        setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
-                    } catch (JSONException e) {
-                        new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
-                    }
+                    handleResult(msg);
+                    stopSpinner();
                     break;
-                default:
-                    return false;
             }
-            stopSpinner();
-            return true;
+            return messageHandled;
+        }
+
+        private void handleResult(Message msg) {
+            try {
+                JSONArray slots = ((JSONObject) new JSONTokener((String) msg.obj).nextValue())
+                        .getJSONObject("history").getJSONArray("slots");
+                historyItems = new ArrayList<HistoryInfo>(slots.length());
+                for (int i = 0; i < slots.length(); i++) {
+                    JSONObject slot = slots.getJSONObject(i);
+
+                    Status status;
+                    try {
+                        status = Status.valueOf(slot.getString("status"));
+                    } catch (IllegalArgumentException e) {
+                        Log.w(TAG, "status " + slot.getString("status") + " is not recognized.");
+                        status = Status.Unknown;
+                    }
+                    historyItems.add(new HistoryInfo(
+                            slot.getString("nzb_name").replace(".nzb", ""),
+                            slot.getLong("completed"),
+                            status == Status.Failed ? slot.getString("fail_message") : slot.getString("action_line")));
+                }
+                setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
+            } catch (JSONException e) {
+                new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
+            }
         }
     }
 

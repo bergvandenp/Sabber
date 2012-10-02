@@ -72,7 +72,7 @@ public class SearchableActivity extends ListActivity{
         dialog = ProgressDialog.show(this, "", getString(R.string.title_loading), true);
         String searchString = createSearchString(query);
         Log.i(TAG, "searching with url: " + searchString);
-        httpHandler.sendMessage(httpHandler.obtainMessage(HttpGetHandler.MSG_REQUEST, searchString));
+        httpHandler.executeRequest(searchString);
     }
 
     private String createSearchString(String query) {

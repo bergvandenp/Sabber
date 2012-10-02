@@ -141,13 +141,13 @@ public class MainActivity extends SherlockFragmentActivity {
     private void togglePauseSabnzb() {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(this);
         if (preferences != null) {
-            Message message = httpHandler.obtainMessage(HttpGetHandler.MSG_REQUEST);
+            String message;
             if (paused) {
-                message.obj = createResumeConnection(preferences);
+                message = createResumeConnection(preferences);
             } else {
-                message.obj = createPauseConnection(preferences);
+                message = createPauseConnection(preferences);
             }
-            new HttpGetHandler(new MainCallback()).sendMessage(message);
+            new HttpGetHandler(new MainCallback()).executeRequest(message);
         }
     }
 

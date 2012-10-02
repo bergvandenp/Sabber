@@ -74,9 +74,8 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
                 .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                httpGetHandler.sendMessage(httpGetHandler.obtainMessage(
-                                        HttpGetHandler.MSG_REQUEST,
-                                        createConnectionChangeCategory(preferences, queueInfo.getId(), categories.get(i))));
+                                httpGetHandler.executeRequest(
+                                        createConnectionChangeCategory(preferences, queueInfo.getId(), categories.get(i)));
                             }
                         });
     }
@@ -84,9 +83,8 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
     private DialogInterface.OnClickListener createDeleteClickListener(final QueueInfo queueInfo, final SharedPreferences preferences) {
         return new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        httpGetHandler.sendMessage(httpGetHandler.obtainMessage(
-                                HttpGetHandler.MSG_REQUEST,
-                                createConnectionDeleteItem(preferences, queueInfo.getId())));
+                        httpGetHandler.executeRequest(
+                                createConnectionDeleteItem(preferences, queueInfo.getId()));
                     }
                 };
     }

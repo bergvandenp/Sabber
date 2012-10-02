@@ -1,5 +1,10 @@
 package nl.napauleon.sabber.queue;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +20,8 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.history.HistoryFragment;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,7 +31,7 @@ import org.json.JSONTokener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadingFragment extends SherlockListFragment{
+public class DownloadingFragment extends SherlockListFragment {
 
     private TextView timeLeftView, speedView, sizeView, etaView;
     private QueueClickListener itemClickListener;
@@ -97,10 +104,7 @@ public class DownloadingFragment extends SherlockListFragment{
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
             Message message = Message.obtain();
             message.obj = createQueueConnectionString(preferences);
-            httpHandler.sendMessage(httpHandler.obtainMessage(
-                    HttpGetHandler.MSG_REQUEST,
-                    createQueueConnectionString(preferences)
-            ));
+            httpHandler.executeRequest(createQueueConnectionString(preferences));
         }
     }
 
@@ -112,35 +116,55 @@ public class DownloadingFragment extends SherlockListFragment{
         );
     }
 
-    private class DownloadingCallback implements Handler.Callback {
-
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case HttpGetHandler.MSG_RESULT:
-                try {
-                    JSONObject queue = ((JSONObject) new JSONTokener((String) msg.obj)
-                            .nextValue()).getJSONObject("queue");
-
-                    togglePause(queue);
-
-                    queueItems = extractQueueItems(queue);
-                    setListAdapter(new QueueListAdapter(getActivity(), queueItems));
-                    itemClickListener.setCategories(retrieveCategories(queue.getJSONArray("categories")));
-                    itemClickListener.setQueueItems(queueItems);
-
-                    populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
-                            queue.getString("speed"), queue.getString("eta"));
-                } catch (JSONException e) {
-                    new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
-                }
-                break;
-            default:
-                // causes further message handling
-                return false;
+    private class DownloadingCallback extends DefaultErrorCallback {
+        public DownloadingCallback() {
+            super(DownloadingFragment.this.getActivity());
         }
-        stopSpinner();
-        return true;
+
+        public boolean handleMessage(Message msg) {
+            boolean messageHandled = super.handleMessage(msg);
+            if (messageHandled) {
+                stopSpinner();
+                return true;
+            }
+            switch (msg.what) {
+                case HttpGetHandler.MSG_RESULT:
+                    handleResult(msg);
+                    stopSpinner();
+                    break;
+            }
+            return messageHandled;
+        }
+
+        private void handleResult(Message msg) {
+            try {
+                JSONObject queue = ((JSONObject) new JSONTokener((String) msg.obj)
+                        .nextValue()).getJSONObject("queue");
+
+                togglePause(queue);
+
+                queueItems = extractQueueItems(queue);
+                setListAdapter(new QueueListAdapter(getActivity(), queueItems));
+                itemClickListener.setCategories(retrieveCategories(queue.getJSONArray("categories")));
+                itemClickListener.setQueueItems(queueItems);
+
+                populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
+                        queue.getString("speed"), queue.getString("eta"));
+                showNotification();
+            } catch (JSONException e) {
+                new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
+            }
+        }
     }
+
+    private void showNotification() {
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        Intent[] intents = {new Intent(getActivity(), HistoryFragment.class)};
+        PendingIntent contentIntent = PendingIntent.getActivities(getActivity(), 0, intents, PendingIntent.FLAG_CANCEL_CURRENT);
+        Notification notification = new Notification(R.drawable.ic_launcher, "test", System.currentTimeMillis());
+        notification.setLatestEventInfo(getActivity(), "testitel", "test", contentIntent);
+        notification.defaults = Notification.DEFAULT_ALL;
+        notificationManager.notify(66, notification);
     }
 
     private List<QueueInfo> extractQueueItems(JSONObject queue) throws JSONException {

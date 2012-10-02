@@ -67,7 +67,7 @@ public class SearchClickListener implements AdapterView.OnItemClickListener{
                                 if (preferences != null) {
 
                                     String connectionString = createConnectionString(preferences, results.get(position));
-                                    httpTask.sendMessage(httpTask.obtainMessage(HttpGetHandler.MSG_REQUEST, connectionString));
+                                    httpTask.executeRequest(connectionString);
                                 }
                             }
                         })
