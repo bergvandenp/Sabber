@@ -25,6 +25,8 @@
             <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
         </activity>
 
+        <service android:name=".history.NotificationService" android:exported="false"/>
+
         <meta-data android:name="android.app.default_searchable" android:value=".search.SearchableActivity"/>
     </application>
 </manifest>

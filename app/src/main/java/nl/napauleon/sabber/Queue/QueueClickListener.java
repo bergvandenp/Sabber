@@ -14,6 +14,7 @@ import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -75,7 +76,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 httpGetHandler.executeRequest(
-                                        createConnectionChangeCategory(preferences, queueInfo.getId(), categories.get(i)));
+                                        new SabNzbConnectionHelper(preferences).createChangeCategoryConnectionString(queueInfo.getId(), categories.get(i)));
                             }
                         });
     }
@@ -84,7 +85,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
         return new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         httpGetHandler.executeRequest(
-                                createConnectionDeleteItem(preferences, queueInfo.getId()));
+                                new SabNzbConnectionHelper(preferences).createDeleteItemConnectionString(queueInfo.getId()));
                     }
                 };
     }
@@ -97,29 +98,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
                 };
     }
 
-    private String createConnectionDeleteItem(SharedPreferences preferences, String itemId) {
-        return String.format("http://%s:%s/api" +
-                "?mode=queue" +
-                "&name=delete" +
-                "&apikey=%s" +
-                "&value=%s",
-                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                preferences.getString(ContextHelper.PORT_PREF, ""),
-                preferences.getString(ContextHelper.APIKEY_PREF, ""),
-                itemId);
-    }
 
-    private String createConnectionChangeCategory(SharedPreferences preferences, String itemId, String category) {
-        return String.format("http://%s:%s/api" +
-                "?mode=change_cat" +
-                "&value=%s" +
-                "&value2=%s" +
-                "&apikey=%s",
-                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                preferences.getString(ContextHelper.PORT_PREF, ""),
-                itemId, category,
-                preferences.getString(ContextHelper.APIKEY_PREF, ""));
-    }
 
     public void setQueueItems(List<QueueInfo> queueItems) {
         this.queueItems = queueItems;

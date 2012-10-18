@@ -10,6 +10,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import nl.napauleon.sabber.history.HistoryFragment;
+import nl.napauleon.sabber.history.NotificationService;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
 import nl.napauleon.sabber.queue.DownloadingFragment;
@@ -22,7 +23,6 @@ public class MainActivity extends SherlockFragmentActivity {
     private TabListener<DownloadingFragment> downloadingListener;
     private TabListener<HistoryFragment> historyListener;
     private boolean paused = false;
-    private HttpGetHandler httpHandler;
 
     public void setPaused(boolean paused) {
         this.paused = paused;
@@ -30,7 +30,6 @@ public class MainActivity extends SherlockFragmentActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        httpHandler = new HttpGetHandler(new MainCallback());
         requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -39,6 +38,8 @@ public class MainActivity extends SherlockFragmentActivity {
             Intent settingsActivity = new Intent(getBaseContext(), Settings.class);
             startActivity(settingsActivity);
         }
+        Intent intent = new Intent(this, NotificationService.class);
+        startService(intent);
     }
 
     @Override
@@ -106,7 +107,6 @@ public class MainActivity extends SherlockFragmentActivity {
                 menuItem.setIcon(R.drawable.ic_pause);
                 menuItem.setTitle(R.string.menu_pause);
             }
-
         }
         return true;
     }

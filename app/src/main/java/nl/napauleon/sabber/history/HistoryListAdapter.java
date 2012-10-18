@@ -3,7 +3,6 @@ package nl.napauleon.sabber.history;
 import android.app.Activity;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -28,8 +27,7 @@ public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		LayoutInflater inflater = activity.getLayoutInflater();
-		View rowView = inflater.inflate(R.layout.historyrowlayout, null, true);
+        View rowView = activity.getLayoutInflater().inflate(R.layout.historyrowlayout, null, true);
 		TextView textView = (TextView) rowView.findViewById(R.id.itemname);
 		TextView dateView = (TextView) rowView.findViewById(R.id.itemdate);
         TextView messageView = (TextView) rowView.findViewById(R.id.historymessage);
@@ -38,11 +36,11 @@ public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
 
         textView.setText(historyInfo.getItem());
         try {
-            Date dateDownloaded = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(historyInfo.getDateDownloaded());
+            Date dateDownloaded = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(historyInfo.getDateDownloadedAsString());
             dateView.setText(DateUtils.getRelativeTimeSpanString(dateDownloaded.getTime()));
         } catch (ParseException e) {
-            Log.w("Sabber", "couldnt parse date" + historyInfo.getDateDownloaded());
-            dateView.setText(historyInfo.getDateDownloaded());
+            Log.w("Sabber", "couldnt parse date" + historyInfo.getDateDownloadedAsString());
+            dateView.setText(historyInfo.getDateDownloadedAsString());
         }
         messageView.setText(historyInfo.getMessage());
 		return rowView;

@@ -3,7 +3,6 @@ package nl.napauleon.sabber.history;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,25 +10,23 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HistoryFragment extends SherlockListFragment{
 
-    public static final String TAG = "HistoryFragment";
-    private ArrayList<HistoryInfo> historyItems;
     private HttpGetHandler httpHandler;
+    private List<HistoryInfo> historyItems;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        httpHandler = new HttpGetHandler(new HistoryCallback());
+        httpHandler = new HttpGetHandler(new HistoryFragmentCallback());
     }
 
     @Override
@@ -48,19 +45,12 @@ public class HistoryFragment extends SherlockListFragment{
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            httpHandler.executeRequest(createHistoryConnectionString(preferences));
+            httpHandler.executeRequest(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
         }
     }
 
-    String createHistoryConnectionString(SharedPreferences preferences) {
-        return String.format("http://%s:%s/api?mode=history&limit=100&output=json&apikey=%s",
-                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                preferences.getString(ContextHelper.PORT_PREF, ""),
-                preferences.getString(ContextHelper.APIKEY_PREF, ""));
-    }
-
-    private class HistoryCallback extends DefaultErrorCallback {
-        public HistoryCallback() {
+    private class HistoryFragmentCallback extends DefaultErrorCallback {
+        public HistoryFragmentCallback() {
             super(HistoryFragment.this.getActivity());
         }
 
@@ -80,28 +70,13 @@ public class HistoryFragment extends SherlockListFragment{
         }
 
         private void handleResult(Message msg) {
+            ContextHelper contextHelper = new ContextHelper();
             try {
-                JSONArray slots = ((JSONObject) new JSONTokener((String) msg.obj).nextValue())
-                        .getJSONObject("history").getJSONArray("slots");
-                historyItems = new ArrayList<HistoryInfo>(slots.length());
-                for (int i = 0; i < slots.length(); i++) {
-                    JSONObject slot = slots.getJSONObject(i);
-
-                    Status status;
-                    try {
-                        status = Status.valueOf(slot.getString("status"));
-                    } catch (IllegalArgumentException e) {
-                        Log.w(TAG, "status " + slot.getString("status") + " is not recognized.");
-                        status = Status.Unknown;
-                    }
-                    historyItems.add(new HistoryInfo(
-                            slot.getString("nzb_name").replace(".nzb", ""),
-                            slot.getLong("completed"),
-                            status == Status.Failed ? slot.getString("fail_message") : slot.getString("action_line")));
-                }
+                historyItems = HistoryInfo.createHistoryList((String) msg.obj);
+                contextHelper.updateLastPollingEvent(getActivity());
                 setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
             } catch (JSONException e) {
-                new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
+                contextHelper.handleJsonException(getActivity(), (String) msg.obj, e);
             }
         }
     }

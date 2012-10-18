@@ -14,6 +14,7 @@ public class ContextHelper {
     public static final String PORT_PREF = "portPref";
     public static final String APIKEY_PREF = "apikeyPref";
     public static final String REFRESHRATE_PREF = "refreshratePref";
+    private static final String LAST_POLLING_EVENT_PREF = "lastpollingeventPref";
     private static final String TAG = "Sabber";
 
     public SharedPreferences checkAndGetSettings(Context context) {
@@ -34,6 +35,14 @@ public class ContextHelper {
         return hostname != null && !hostname.equals("")
                 && port != null && !port.equals("")
                 && apikey != null && !apikey.equals("");
+    }
+
+    public long updateLastPollingEvent(Context context) {
+        long last_polling_event = System.currentTimeMillis();
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putLong(LAST_POLLING_EVENT_PREF, last_polling_event);
+        editor.commit();
+        return last_polling_event;
     }
 
     public void handleJsonException(Context context, String originalJsonString, JSONException exception) {

@@ -23,6 +23,7 @@ import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.history.HistoryFragment;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,18 +103,8 @@ public class DownloadingFragment extends SherlockListFragment {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            Message message = Message.obtain();
-            message.obj = createQueueConnectionString(preferences);
-            httpHandler.executeRequest(createQueueConnectionString(preferences));
+            httpHandler.executeRequest(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
         }
-    }
-
-    String createQueueConnectionString(SharedPreferences preferences) {
-        return String.format("http://%s:%s/api?mode=queue&output=json&apikey=%s",
-                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                preferences.getString(ContextHelper.PORT_PREF, ""),
-                preferences.getString(ContextHelper.APIKEY_PREF, "")
-        );
     }
 
     private class DownloadingCallback extends DefaultErrorCallback {
@@ -150,10 +141,21 @@ public class DownloadingFragment extends SherlockListFragment {
 
                 populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
                         queue.getString("speed"), queue.getString("eta"));
+                showNotification();
             } catch (JSONException e) {
                 new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
             }
         }
+    }
+
+    private void showNotification() {
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        Intent[] intents = {new Intent(getActivity(), HistoryFragment.class)};
+        PendingIntent contentIntent = PendingIntent.getActivities(getActivity(), 0, intents, PendingIntent.FLAG_CANCEL_CURRENT);
+        Notification notification = new Notification(R.drawable.ic_launcher, "test", System.currentTimeMillis());
+        notification.setLatestEventInfo(getActivity(), "testitel", "test", contentIntent);
+        notification.defaults = Notification.DEFAULT_ALL;
+        notificationManager.notify(66, notification);
     }
 
     private List<QueueInfo> extractQueueItems(JSONObject queue) throws JSONException {
