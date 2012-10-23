@@ -104,7 +104,5 @@ public class SearchableActivity extends ListActivity{
             Log.e(TAG, "error parsing results", e);
             new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
         }
-
-
     }
 }

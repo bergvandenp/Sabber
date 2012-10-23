@@ -4,13 +4,17 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.*;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.Settings;
 import nl.napauleon.sabber.http.HttpGetHandler;
 import org.json.JSONException;
 
@@ -59,6 +63,7 @@ public class NotificationService extends Service {
 
     @Override
     public void onDestroy() {
+        serviceHandler.removeCallbacks(pollingThread);
         Log.d(TAG, "Notification Service stopped");
     }
 
@@ -86,16 +91,20 @@ public class NotificationService extends Service {
         @Override
         public void handleMessage(Message msg) {
             Log.d(TAG, "Polling message received.");
-            httpHandler.executeRequest(createHistoryConnectionString());
-            last_polling_event = new ContextHelper().updateLastPollingEvent(NotificationService.this);
+            ConnectivityManager connectivityService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityService.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                httpHandler.executeRequest(createHistoryConnectionString());
+                last_polling_event = new ContextHelper().updateLastPollingEvent(NotificationService.this);
+            }
         }
 
         String createHistoryConnectionString() {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NotificationService.this);
             return String.format("http://%s:%s/api?mode=history&limit=5&output=json&apikey=%s",
-                    preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                    preferences.getString(ContextHelper.PORT_PREF, ""),
-                    preferences.getString(ContextHelper.APIKEY_PREF, ""));
+                    preferences.getString(Settings.HOSTNAME_PREF, ""),
+                    preferences.getString(Settings.PORT_PREF, ""),
+                    preferences.getString(Settings.APIKEY_PREF, ""));
         }
     }
 

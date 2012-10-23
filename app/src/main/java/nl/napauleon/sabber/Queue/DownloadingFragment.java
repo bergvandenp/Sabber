@@ -1,10 +1,5 @@
 package nl.napauleon.sabber.queue;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,14 +15,12 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.history.HistoryFragment;
+import nl.napauleon.sabber.Settings;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import nl.napauleon.sabber.http.SabnzbResultHelper;
+import nl.napauleon.sabber.search.GlobalInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +39,7 @@ public class DownloadingFragment extends SherlockListFragment {
         }
     };
     private int refreshrate;
+    private SharedPreferences preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +73,8 @@ public class DownloadingFragment extends SherlockListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        refreshrate = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(ContextHelper.REFRESHRATE_PREF, "0"));
+        preferences = new ContextHelper().checkAndGetSettings(getActivity());
+        refreshrate = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(Settings.REFRESHRATE_PREF, "0"));
         if (refreshrate > 0) {
             backgroundHandler.postDelayed(backgroundUpdater, refreshrate * 1000);
         } else {
@@ -100,7 +95,6 @@ public class DownloadingFragment extends SherlockListFragment {
     }
 
     public void retrieveQueueData() {
-        SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
             httpHandler.executeRequest(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
@@ -128,61 +122,21 @@ public class DownloadingFragment extends SherlockListFragment {
         }
 
         private void handleResult(Message msg) {
-            try {
-                JSONObject queue = ((JSONObject) new JSONTokener((String) msg.obj)
-                        .nextValue()).getJSONObject("queue");
+            SabnzbResultHelper sabnzbResultHelper = new SabnzbResultHelper((String) msg.obj);
+            togglePause(sabnzbResultHelper.isPaused());
 
-                togglePause(queue);
+            queueItems = sabnzbResultHelper.parseQueueItems();
+            setListAdapter(new QueueListAdapter(getActivity(), queueItems));
+            itemClickListener.setCategories(sabnzbResultHelper.parseCategories());
+            itemClickListener.setQueueItems(queueItems);
 
-                queueItems = extractQueueItems(queue);
-                setListAdapter(new QueueListAdapter(getActivity(), queueItems));
-                itemClickListener.setCategories(retrieveCategories(queue.getJSONArray("categories")));
-                itemClickListener.setQueueItems(queueItems);
-
-                populateGlobalInformation(queue.getString("timeleft"), queue.getString("size"),
-                        queue.getString("speed"), queue.getString("eta"));
-                showNotification();
-            } catch (JSONException e) {
-                new ContextHelper().handleJsonException(getActivity(), (String) msg.obj, e);
-            }
+            populateGlobalInformation(sabnzbResultHelper.parseGlobalInfo());
         }
     }
 
-    private void showNotification() {
-        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        Intent[] intents = {new Intent(getActivity(), HistoryFragment.class)};
-        PendingIntent contentIntent = PendingIntent.getActivities(getActivity(), 0, intents, PendingIntent.FLAG_CANCEL_CURRENT);
-        Notification notification = new Notification(R.drawable.ic_launcher, "test", System.currentTimeMillis());
-        notification.setLatestEventInfo(getActivity(), "testitel", "test", contentIntent);
-        notification.defaults = Notification.DEFAULT_ALL;
-        notificationManager.notify(66, notification);
-    }
-
-    private List<QueueInfo> extractQueueItems(JSONObject queue) throws JSONException {
-        JSONArray slots = queue.getJSONArray("slots");
-        List<QueueInfo> queueItems = new ArrayList<QueueInfo>(slots.length());
-        for (int i = 0; i < slots.length(); i++) {
-            JSONObject slot = slots.getJSONObject(i);
-            queueItems.add(new QueueInfo(
-                    slot.getString("nzo_id"),
-                    slot.getString("filename"),
-                    slot.getString("timeleft"),
-                    slot.getInt("percentage")));
-        }
-        return queueItems;
-    }
-
-    private List<String> retrieveCategories(JSONArray jsonCategories) throws JSONException {
-        List<String> categories = new ArrayList<String>(jsonCategories.length());
-        for (int i = 0; i < jsonCategories.length(); i++) {
-            categories.add(jsonCategories.getString(i));
-        }
-        return categories;
-    }
-
-    private void togglePause(JSONObject queue) throws JSONException {
+    private void togglePause(boolean paused) {
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).setPaused(queue.getBoolean("paused"));
+            ((MainActivity) getActivity()).setPaused(paused);
             if (Build.VERSION.SDK_INT >= 11) {
                 getActivity().invalidateOptionsMenu();
             }
@@ -196,18 +150,18 @@ public class DownloadingFragment extends SherlockListFragment {
         }
     }
 
-    private void populateGlobalInformation(String timeleft, String size, String speed, String eta) throws JSONException {
+    private void populateGlobalInformation(GlobalInfo globalInfo) {
         if (timeLeftView != null) {
-            timeLeftView.setText(timeleft);
+            timeLeftView.setText(globalInfo.getTimeleft());
         }
         if (sizeView != null) {
-            sizeView.setText(size);
+            sizeView.setText(globalInfo.getSize());
         }
         if (speedView != null) {
-            speedView.setText(speed);
+            speedView.setText(globalInfo.getSpeed());
         }
         if (etaView != null) {
-            etaView.setText(eta);
+            etaView.setText(globalInfo.getEta());
         }
     }
 

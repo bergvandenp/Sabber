@@ -1,12 +1,20 @@
 package nl.napauleon.sabber;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import nl.napauleon.sabber.history.NotificationService;
 
 public class Settings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    public static final String HOSTNAME_PREF = "hostnamePref";
+    public static final String PORT_PREF = "portPref";
+    public static final String APIKEY_PREF = "apikeyPref";
+    public static final String REFRESHRATE_PREF = "refreshratePref";
+    public static final String NOTIFICATIONS_PREF = "notificationsPref";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +35,15 @@ public class Settings extends PreferenceActivity implements SharedPreferences.On
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Preference preference = getPreferenceScreen().findPreference(key);
-        preference.setSummary(sharedPreferences.getString(key, ""));
+        if (NOTIFICATIONS_PREF.equals(key)) {
+            boolean notificationsEnabled = sharedPreferences.getBoolean(key, false);
+            Intent intent = new Intent(this, NotificationService.class);
+            if (notificationsEnabled) {
+                startService(intent);
+            } else {
+                stopService(intent);
+            }
+        }
     }
 
     @Override

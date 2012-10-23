@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.Settings;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
 
@@ -45,9 +46,9 @@ public class SearchClickListener implements AdapterView.OnItemClickListener{
                 name = matcher.group(1);
             }
             return String.format("http://%s:%s/api?mode=addurl&apikey=%s&name=%s&nzbname=%s",
-                    preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                    preferences.getString(ContextHelper.PORT_PREF, ""),
-                    preferences.getString(ContextHelper.APIKEY_PREF, ""),
+                    preferences.getString(Settings.HOSTNAME_PREF, ""),
+                    preferences.getString(Settings.PORT_PREF, ""),
+                    preferences.getString(Settings.APIKEY_PREF, ""),
                     URLEncoder.encode(link, ENCODING),
                     URLEncoder.encode(name, ENCODING));
         } catch (UnsupportedEncodingException e) {

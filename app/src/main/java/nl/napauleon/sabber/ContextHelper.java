@@ -9,11 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ContextHelper {
-
-    public static final String HOSTNAME_PREF = "hostnamePref";
-    public static final String PORT_PREF = "portPref";
-    public static final String APIKEY_PREF = "apikeyPref";
-    public static final String REFRESHRATE_PREF = "refreshratePref";
     private static final String LAST_POLLING_EVENT_PREF = "lastpollingeventPref";
     private static final String TAG = "Sabber";
 
@@ -28,13 +23,18 @@ public class ContextHelper {
 
     public boolean isSabnzbSettingsPresent(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String hostname = prefs.getString(HOSTNAME_PREF, "");
-        String port = prefs.getString(PORT_PREF, "");
-        String apikey = prefs.getString(APIKEY_PREF, "");
+        String hostname = prefs.getString(Settings.HOSTNAME_PREF, "");
+        String port = prefs.getString(Settings.PORT_PREF, "");
+        String apikey = prefs.getString(Settings.APIKEY_PREF, "");
 
         return hostname != null && !hostname.equals("")
                 && port != null && !port.equals("")
                 && apikey != null && !apikey.equals("");
+    }
+
+    public boolean isNotificationsEnabled(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(Settings.NOTIFICATIONS_PREF, false);
     }
 
     public long updateLastPollingEvent(Context context) {

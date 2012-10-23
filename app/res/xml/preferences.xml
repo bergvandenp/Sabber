@@ -33,5 +33,10 @@
             android:key="minsizePref"
             android:inputType="number"
             android:name="Minimal size Preference"/>
+    <CheckBoxPreference
+            android:summary="@string/pref_notifications_summary"
+            android:title="@string/pref_notifications_title"
+            android:key="notificationsPref"
+            android:name="Notifications Preference"/>
 
 </PreferenceScreen>

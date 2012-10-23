@@ -13,6 +13,7 @@ import nl.napauleon.sabber.history.HistoryFragment;
 import nl.napauleon.sabber.history.NotificationService;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.queue.DownloadingFragment;
 
 public class MainActivity extends SherlockFragmentActivity {
@@ -34,12 +35,15 @@ public class MainActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         setSupportProgressBarIndeterminateVisibility(false);
-        if (!new ContextHelper().isSabnzbSettingsPresent(this)) {
+        ContextHelper contextHelper = new ContextHelper();
+        if (!contextHelper.isSabnzbSettingsPresent(this)) {
             Intent settingsActivity = new Intent(getBaseContext(), Settings.class);
             startActivity(settingsActivity);
         }
-        Intent intent = new Intent(this, NotificationService.class);
-        startService(intent);
+        if (contextHelper.isNotificationsEnabled(this)){
+            Intent intent = new Intent(this, NotificationService.class);
+            startService(intent);
+        }
     }
 
     @Override
@@ -142,27 +146,14 @@ public class MainActivity extends SherlockFragmentActivity {
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(this);
         if (preferences != null) {
             String message;
+            SabNzbConnectionHelper connectionHelper = new SabNzbConnectionHelper(preferences);
             if (paused) {
-                message = createResumeConnection(preferences);
+                message = connectionHelper.createResumeConnection();
             } else {
-                message = createPauseConnection(preferences);
+                message = connectionHelper.createPauseConnection();
             }
             new HttpGetHandler(new MainCallback()).executeRequest(message);
         }
-    }
-
-    private String createResumeConnection(SharedPreferences preferences) {
-        return String.format("http://%s:%s/api?mode=resume&apikey=%s",
-                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                preferences.getString(ContextHelper.PORT_PREF, ""),
-                preferences.getString(ContextHelper.APIKEY_PREF, ""));
-    }
-
-    private String createPauseConnection(SharedPreferences preferences) {
-        return String.format("http://%s:%s/api?mode=pause&apikey=%s",
-                preferences.getString(ContextHelper.HOSTNAME_PREF, ""),
-                preferences.getString(ContextHelper.PORT_PREF, ""),
-                preferences.getString(ContextHelper.APIKEY_PREF, ""));
     }
 
     private class MainCallback extends DefaultErrorCallback {

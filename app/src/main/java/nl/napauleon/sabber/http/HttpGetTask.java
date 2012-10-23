@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -47,11 +48,18 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             }
 
         } catch (ConnectTimeoutException e) {
-            Log.e(TAG, "Network exception", e);
+            Log.e(TAG, "Connection timed out for uri " + strings[0]);
             handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONTIMEOUT));
-        } catch (Exception e) {
-            Log.e(TAG, "Network exception", e);
-            handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONERROR));
+        } catch (ClientProtocolException e) {
+            Log.e(TAG, "Http error occured", e);
+            handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONTIMEOUT));
+        } catch (IOException e) {
+            if (e.getMessage().startsWith("Connection to ")) {
+                Log.w(TAG, "Failed to connect to " + strings[0]);
+            } else {
+                Log.e(TAG, "IO exception occured", e);
+            }
+            handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONTIMEOUT));
         }
         return null;
     }
