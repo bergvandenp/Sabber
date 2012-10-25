@@ -9,8 +9,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ContextHelper {
-    private static final String LAST_POLLING_EVENT_PREF = "lastpollingeventPref";
+    protected static final String LAST_POLLING_EVENT_PREF = "lastpollingeventPref";
     private static final String TAG = "Sabber";
+    public static final String MESSAGE_CONNECTION_TIMEOUT = "Connection Timeout. Please try again later";
+    public static final String MESSAGE_SETTINGS_NOT_VALID = "Settings are not valid. Check host and port configuration.";
 
     public SharedPreferences checkAndGetSettings(Context context) {
         if (!isSabnzbSettingsPresent(context)) {
@@ -54,7 +56,7 @@ public class ContextHelper {
     }
 
     public void showConnectionErrorAlert(Context context) {
-        showErrorAlert(context, "Settings are not valid. Check host and port configuration.");
+        showErrorAlert(context, MESSAGE_SETTINGS_NOT_VALID);
     }
 
     public void showErrorAlert(Context context, String message) {
@@ -62,6 +64,6 @@ public class ContextHelper {
     }
 
     public void showConnectionTimeoutAlert(Context context) {
-        showErrorAlert(context, "Connection Timeout. Please try again later");
+        showErrorAlert(context, MESSAGE_CONNECTION_TIMEOUT);
     }
 }

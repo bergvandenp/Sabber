@@ -101,7 +101,7 @@ public class DownloadingFragment extends SherlockListFragment {
         }
     }
 
-    private class DownloadingCallback extends DefaultErrorCallback {
+    public class DownloadingCallback extends DefaultErrorCallback {
         public DownloadingCallback() {
             super(DownloadingFragment.this.getActivity());
         }

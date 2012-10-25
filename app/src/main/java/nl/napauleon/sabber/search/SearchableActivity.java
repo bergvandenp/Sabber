@@ -66,8 +66,8 @@ public class SearchableActivity extends ListActivity{
         httpHandler.executeRequest(searchString);
     }
 
-    private class SearchCallback extends DefaultErrorCallback {
-        private SearchCallback() {
+    public class SearchCallback extends DefaultErrorCallback {
+        protected SearchCallback() {
             super(SearchableActivity.this);
         }
 

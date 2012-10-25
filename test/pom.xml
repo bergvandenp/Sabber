@@ -1,33 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <version>1.1.1-SNAPSHOT</version>
+        <groupId>nl.napauleon.sabber</groupId>
+        <artifactId>sabber-parent</artifactId>
+    </parent>
+
     <artifactId>sabber-test</artifactId>
     <packaging>jar</packaging>
     <name>Sabber Android test</name>
 
-    <parent>
-        <version>1.0.1-SNAPSHOT</version>
-        <groupId>nl.napauleon.sabber</groupId>
-        <artifactId>sabber-parent</artifactId>
-    </parent>
 
     <properties>
         <abs.version>4.0.1</abs.version>
         <robolectric.version>1.1</robolectric.version>
     </properties>
     <dependencies>
-        <!-- <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>sabber</artifactId>
-            <version>${project.version}</version>
-            <type>apk</type>
-        </dependency> -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sabber</artifactId>
-            <version>${project.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.actionbarsherlock</groupId>
