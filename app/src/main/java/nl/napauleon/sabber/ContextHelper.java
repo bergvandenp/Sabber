@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ContextHelper {
-    private static final String LAST_POLLING_EVENT_PREF = "lastpollingeventPref";
+    public static final String LAST_POLLING_EVENT_PREF = "lastpollingeventPref";
     private static final String TAG = "Sabber";
 
     public SharedPreferences checkAndGetSettings(Context context) {

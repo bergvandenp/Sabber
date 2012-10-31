@@ -14,6 +14,8 @@ import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
+import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.Settings;
 import nl.napauleon.sabber.http.HttpGetHandler;
 import org.json.JSONException;
@@ -39,12 +41,13 @@ public class NotificationService extends Service {
         serviceHandler = new ServiceHandler(notificationThread.getLooper());
         httpHandler = new HttpGetHandler(new HistoryCallback());
 
-        notificationIntent = PendingIntent.getActivity(NotificationService.this, 0, new Intent(getBaseContext(), HistoryFragment.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationIntent = PendingIntent.getActivity(NotificationService.this, 0, new Intent(getBaseContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Notification Service starting");
+        last_polling_event = PreferenceManager.getDefaultSharedPreferences(this).getLong(ContextHelper.LAST_POLLING_EVENT_PREF, System.currentTimeMillis());
         pollingThread = new Runnable() {
             public void run() {
                 serviceHandler.sendMessage(serviceHandler.obtainMessage());
@@ -68,7 +71,12 @@ public class NotificationService extends Service {
     }
 
     private boolean notifyDownloadedItem(HistoryInfo historyItem) {
-        return last_polling_event < historyItem.getDateDownloaded().getTime();
+
+        long itemDateDownloaded = historyItem.getDateDownloaded().getTime();
+        boolean shouldNotify = last_polling_event < itemDateDownloaded;
+        Log.d(TAG, String.format("ShouldNotify: %s. last polling event: %s. item downloaded %s",
+                shouldNotify, last_polling_event, itemDateDownloaded));
+        return shouldNotify;
     }
 
     private void sendNotification(HistoryInfo historyItem) {
@@ -76,6 +84,7 @@ public class NotificationService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification notification = new Notification.Builder(this)
                 .setContentIntent(notificationIntent)
+                .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("Sabber")
                 .setContentText(historyItem.getItem() + " download complete.")
                 .getNotification();
@@ -95,7 +104,6 @@ public class NotificationService extends Service {
             NetworkInfo networkInfo = connectivityService.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
                 httpHandler.executeRequest(createHistoryConnectionString());
-                last_polling_event = new ContextHelper().updateLastPollingEvent(NotificationService.this);
             }
         }
 
@@ -125,6 +133,7 @@ public class NotificationService extends Service {
                 for (HistoryInfo historyItem : historyItems) {
                     if (notifyDownloadedItem(historyItem)) {
                         sendNotification(historyItem);
+                        last_polling_event = new ContextHelper().updateLastPollingEvent(NotificationService.this);
                     }
                 }
             } catch (JSONException e) {
