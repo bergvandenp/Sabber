@@ -11,8 +11,12 @@ public class Utils {
     static public Message createResultMessage(String filename) throws IOException {
         Message message = new Message();
         message.what = HttpGetHandler.MSG_RESULT;
-        File file = FileUtils.toFile(ClassLoader.getSystemClassLoader().getResource(filename));
-        message.obj = FileUtils.readFileToString(file);
+        message.obj = readFileToString(filename);
         return message;
+    }
+
+    static public String readFileToString(String filename) throws IOException {
+        File file = FileUtils.toFile(ClassLoader.getSystemClassLoader().getResource(filename));
+        return FileUtils.readFileToString(file);
     }
 }
