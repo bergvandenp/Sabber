@@ -49,7 +49,7 @@ public class HistoryFragment extends SherlockListFragment{
         }
     }
 
-    private class HistoryFragmentCallback extends DefaultErrorCallback {
+    public class HistoryFragmentCallback extends DefaultErrorCallback {
         public HistoryFragmentCallback() {
             super(HistoryFragment.this.getActivity());
         }
@@ -71,12 +71,13 @@ public class HistoryFragment extends SherlockListFragment{
 
         private void handleResult(Message msg) {
             ContextHelper contextHelper = new ContextHelper();
+            String messageText = (String) msg.obj;
             try {
-                historyItems = HistoryInfo.createHistoryList((String) msg.obj);
+                historyItems = HistoryInfo.createHistoryList(messageText);
                 contextHelper.updateLastPollingEvent(getActivity());
                 setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
             } catch (JSONException e) {
-                contextHelper.handleJsonException(getActivity(), (String) msg.obj, e);
+                contextHelper.handleJsonException(getActivity(), messageText, e);
             }
         }
     }

@@ -37,7 +37,7 @@ public class MainActivity extends SherlockFragmentActivity {
         setSupportProgressBarIndeterminateVisibility(false);
         ContextHelper contextHelper = new ContextHelper();
         if (!contextHelper.isSabnzbSettingsPresent(this)) {
-            Intent settingsActivity = new Intent(getBaseContext(), Settings.class);
+            Intent settingsActivity = new Intent(this, Settings.class);
             startActivity(settingsActivity);
         }
         if (contextHelper.isNotificationsEnabled(this)){
