@@ -48,7 +48,7 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             }
 
         } catch (ConnectTimeoutException e) {
-            Log.e(TAG, "Connection timed out for uri " + strings[0]);
+            Log.w(TAG, "Connection timed out for uri " + strings[0]);
             handler.sendMessage(handler.obtainMessage(HttpGetHandler.MSG_CONNECTIONTIMEOUT));
         } catch (ClientProtocolException e) {
             Log.e(TAG, "Http error occured", e);
