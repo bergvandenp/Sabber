@@ -1,7 +1,7 @@
 package nl.napauleon.sabber.search;
 
+import android.R;
 import nl.napauleon.sabber.CustomTestRunner;
-import nl.napauleon.sabber.R;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +21,6 @@ public class SearchableActivityTest {
     @Test
     public void testOnCreate() throws Exception {
         activity.onCreate(null);
-        assertNotNull(activity.findViewById(R.layout.itemlist));
+        assertNotNull(activity.findViewById(R.id.list));
     }
 }
