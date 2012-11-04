@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <version>1.1.3-SNAPSHOT</version>
+        <version>1.1.2-SNAPSHOT</version>
         <groupId>nl.napauleon.sabber</groupId>
         <artifactId>sabber-parent</artifactId>
     </parent>
