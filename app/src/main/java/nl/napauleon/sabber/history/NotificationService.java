@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.*;
@@ -87,6 +88,7 @@ public class NotificationService extends Service {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("Nzb download complete")
                 .setContentText(historyItem.getItem() + " download complete.")
+                .setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION))
                 .getNotification();
         notificationManager.notify(notificationId, notification);
     }
