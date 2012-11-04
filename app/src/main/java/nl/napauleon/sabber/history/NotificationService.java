@@ -85,7 +85,7 @@ public class NotificationService extends Service {
         Notification notification = new Notification.Builder(this)
                 .setContentIntent(notificationIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("Sabber")
+                .setContentTitle("Nzb download complete")
                 .setContentText(historyItem.getItem() + " download complete.")
                 .getNotification();
         notificationManager.notify(notificationId, notification);
