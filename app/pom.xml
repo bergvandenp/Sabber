@@ -6,7 +6,7 @@
     <name>Sabber Android app</name>
 
     <parent>
-        <version>1.1.2-SNAPSHOT</version>
+        <version>1.1.2</version>
         <groupId>nl.napauleon.sabber</groupId>
         <artifactId>sabber-parent</artifactId>
     </parent>
