@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>nl.napauleon.sabber</groupId>
     <artifactId>sabber-parent</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Sabber parent</name>
     <properties>
@@ -16,12 +17,12 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sabber</artifactId>
-                <version>1.1.2</version>
+                <version>1.1.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sabber-test</artifactId>
-                <version>1.1.2</version>
+                <version>1.1.2-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
