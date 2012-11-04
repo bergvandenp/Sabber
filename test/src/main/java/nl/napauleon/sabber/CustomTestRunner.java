@@ -10,7 +10,7 @@ import java.io.File;
 public class CustomTestRunner extends RobolectricTestRunner {
     public CustomTestRunner(Class testClass) throws InitializationError {
         // defaults to "AndroidManifest.xml", "res" in the current directory
-        super(testClass, new File("app/"));
+        super(testClass, new File("../app/"));
         ActionBarSherlock.registerImplementation(ActionBarSherlockRobolectric.class);
         //addClassOrPackageToInstrument("com.actionbarsherlock.app.SherlockActivity");
     }
