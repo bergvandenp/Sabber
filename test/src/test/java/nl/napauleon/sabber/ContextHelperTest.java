@@ -25,14 +25,14 @@ public class ContextHelperTest {
     @Test
     public void testShowConnectionTimeoutAlert() {
         helper.showConnectionTimeoutAlert(context);
-        ShadowToast.showedToast(ContextHelper.MESSAGE_CONNECTION_TIMEOUT);
+        ShadowToast.showedToast(Constants.MESSAGE_CONNECTION_TIMEOUT);
     }
 
     @Test
     public void testUpdateLastPollingEvent() {
         long beforeTime = System.currentTimeMillis();
         helper.updateLastPollingEvent(context);
-        Long lastPollingPref = ShadowPreferenceManager.getDefaultSharedPreferences(context).getLong(ContextHelper.LAST_POLLING_EVENT_PREF, 0L);
+        Long lastPollingPref = ShadowPreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.LAST_POLLING_EVENT_PREF, 0L);
         long afterTime = System.currentTimeMillis();
         assertTrue(lastPollingPref >= beforeTime);
         assertTrue(lastPollingPref <= afterTime);
@@ -65,7 +65,7 @@ public class ContextHelperTest {
     @Test
     public void testCheckAndGetSettings_AllEmpty() throws Exception {
         helper.checkAndGetSettings(context);
-        assertTrue(ShadowToast.showedToast(ContextHelper.MESSAGE_SETTINGS_NOT_VALID));
+        assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ContextHelperTest {
         editor.putString(Settings.APIKEY_PREF, "bla");
         editor.putString(Settings.PORT_PREF, "portbla");
         editor.commit();
-        assertTrue(ShadowToast.showedToast(ContextHelper.MESSAGE_SETTINGS_NOT_VALID));
+        assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ContextHelperTest {
         editor.putString(Settings.APIKEY_PREF, "bla");
         editor.putString(Settings.HOSTNAME_PREF, "hostbla");
         editor.commit();
-        assertTrue(ShadowToast.showedToast(ContextHelper.MESSAGE_SETTINGS_NOT_VALID));
+        assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ContextHelperTest {
         editor.putString(Settings.HOSTNAME_PREF, "hostbla");
         editor.putString(Settings.PORT_PREF, "portbla");
         editor.commit();
-        assertTrue(ShadowToast.showedToast(ContextHelper.MESSAGE_SETTINGS_NOT_VALID));
+        assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ContextHelperTest {
         editor.commit();
         helper.checkAndGetSettings(context);
 
-        assertFalse(ShadowToast.showedToast(ContextHelper.MESSAGE_SETTINGS_NOT_VALID));
+        assertFalse(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
 
     }
 }

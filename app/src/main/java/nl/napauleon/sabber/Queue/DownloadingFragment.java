@@ -1,10 +1,7 @@
 package nl.napauleon.sabber.queue;
 
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.os.*;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.MainActivity;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.Settings;
+import nl.napauleon.sabber.*;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.http.SabnzbResultHelper;
 import nl.napauleon.sabber.search.GlobalInfo;
@@ -25,12 +19,13 @@ import nl.napauleon.sabber.search.GlobalInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nl.napauleon.sabber.Constants.MSG_RESULT;
+
 public class DownloadingFragment extends SherlockListFragment {
 
     private TextView timeLeftView, speedView, sizeView, etaView;
     private QueueClickListener itemClickListener;
     private List<QueueInfo> queueItems;
-    private HttpGetHandler httpHandler;
     private Handler backgroundHandler = new Handler();
     private Runnable backgroundUpdater = new Runnable() {
         public void run() {
@@ -40,12 +35,13 @@ public class DownloadingFragment extends SherlockListFragment {
     };
     private int refreshrate;
     private SharedPreferences preferences;
+    private HttpGetTask httpGetTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         itemClickListener = new QueueClickListener();
-        httpHandler = new HttpGetHandler(new DownloadingCallback());
+        httpGetTask = new HttpGetTask(new Handler(new DownloadingCallback()));
     }
 
     @Override
@@ -97,7 +93,11 @@ public class DownloadingFragment extends SherlockListFragment {
     public void retrieveQueueData() {
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            httpHandler.executeRequest(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
+            if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
+                httpGetTask.cancel(true);
+            }
+            httpGetTask = new HttpGetTask(httpGetTask.getHandler());
+            httpGetTask.execute(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
         }
     }
 
@@ -113,7 +113,7 @@ public class DownloadingFragment extends SherlockListFragment {
                 return true;
             }
             switch (msg.what) {
-                case HttpGetHandler.MSG_RESULT:
+                case MSG_RESULT:
                     handleResult(msg);
                     stopSpinner();
                     break;

@@ -3,6 +3,7 @@ package nl.napauleon.sabber;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -12,9 +13,11 @@ import com.actionbarsherlock.view.MenuItem;
 import nl.napauleon.sabber.history.HistoryFragment;
 import nl.napauleon.sabber.history.NotificationService;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.queue.DownloadingFragment;
+
+import static nl.napauleon.sabber.Constants.*;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -152,7 +155,7 @@ public class MainActivity extends SherlockFragmentActivity {
             } else {
                 message = connectionHelper.createPauseConnection();
             }
-            new HttpGetHandler(new MainCallback()).executeRequest(message);
+            new HttpGetTask(new Handler(new MainCallback())).execute(message);
         }
     }
 
@@ -165,7 +168,7 @@ public class MainActivity extends SherlockFragmentActivity {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case HttpGetHandler.MSG_RESULT:
+                case MSG_RESULT:
                     paused = !paused;
                     invalidateOptionsMenu();
                     break;

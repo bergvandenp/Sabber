@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Message;
 import nl.napauleon.sabber.ContextHelper;
 
+import static nl.napauleon.sabber.Constants.*;
+
 public class DefaultErrorCallback implements Handler.Callback{
 
     private Context context;
@@ -15,10 +17,10 @@ public class DefaultErrorCallback implements Handler.Callback{
 
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
-            case HttpGetHandler.MSG_CONNECTIONTIMEOUT:
+            case MSG_CONNECTIONTIMEOUT:
                 new ContextHelper().showConnectionTimeoutAlert(context);
                 return true;
-            case HttpGetHandler.MSG_CONNECTIONERROR:
+            case MSG_CONNECTIONERROR:
                 new ContextHelper().showConnectionErrorAlert(context);
                 return true;
         }

@@ -14,14 +14,13 @@ import android.os.*;
 import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.MainActivity;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.Settings;
-import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.*;
+import nl.napauleon.sabber.http.HttpGetTask;
 import org.json.JSONException;
 
 import java.util.List;
+
+import static nl.napauleon.sabber.Constants.MSG_RESULT;
 
 public class NotificationService extends Service {
 
@@ -31,7 +30,7 @@ public class NotificationService extends Service {
     private NotificationService.ServiceHandler serviceHandler;
     private Runnable pollingThread;
     private long last_polling_event;
-    private HttpGetHandler httpHandler;
+    private Handler httpHandler;
     private PendingIntent notificationIntent;
     private final int notificationId = 100;
 
@@ -40,7 +39,7 @@ public class NotificationService extends Service {
         HandlerThread notificationThread = new HandlerThread("NotificationThread", Process.THREAD_PRIORITY_BACKGROUND);
         notificationThread.start();
         serviceHandler = new ServiceHandler(notificationThread.getLooper());
-        httpHandler = new HttpGetHandler(new HistoryCallback());
+        httpHandler = new Handler(new HistoryCallback());
 
         notificationIntent = PendingIntent.getActivity(NotificationService.this, 0, new Intent(getBaseContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
     }
@@ -48,7 +47,7 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Notification Service starting");
-        last_polling_event = PreferenceManager.getDefaultSharedPreferences(this).getLong(ContextHelper.LAST_POLLING_EVENT_PREF, System.currentTimeMillis());
+        last_polling_event = PreferenceManager.getDefaultSharedPreferences(this).getLong(Constants.LAST_POLLING_EVENT_PREF, System.currentTimeMillis());
         pollingThread = new Runnable() {
             public void run() {
                 serviceHandler.sendMessage(serviceHandler.obtainMessage());
@@ -105,7 +104,7 @@ public class NotificationService extends Service {
             ConnectivityManager connectivityService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityService.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
-                httpHandler.executeRequest(createHistoryConnectionString());
+                new HttpGetTask(httpHandler).execute(createHistoryConnectionString());
             }
         }
 
@@ -122,7 +121,7 @@ public class NotificationService extends Service {
 
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case HttpGetHandler.MSG_RESULT:
+                case MSG_RESULT:
                     handleResult(msg);
                     return true;
             }

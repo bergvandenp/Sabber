@@ -1,7 +1,9 @@
 package nl.napauleon.sabber.history;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,23 +12,25 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static nl.napauleon.sabber.Constants.MSG_RESULT;
+
 public class HistoryFragment extends SherlockListFragment{
 
-    private HttpGetHandler httpHandler;
     private List<HistoryInfo> historyItems;
+    private HttpGetTask httpGetTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        httpHandler = new HttpGetHandler(new HistoryFragmentCallback());
+        httpGetTask = new HttpGetTask(new Handler(new HistoryFragmentCallback()));
     }
 
     @Override
@@ -45,7 +49,11 @@ public class HistoryFragment extends SherlockListFragment{
         SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
         if (preferences != null) {
             getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-            httpHandler.executeRequest(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
+            if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
+                httpGetTask.cancel(true);
+            }
+            httpGetTask = new HttpGetTask(httpGetTask.getHandler());
+            httpGetTask.execute(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
         }
     }
 
@@ -61,7 +69,7 @@ public class HistoryFragment extends SherlockListFragment{
                 return true;
             }
             switch (msg.what) {
-                case HttpGetHandler.MSG_RESULT:
+                case MSG_RESULT:
                     handleResult(msg);
                     stopSpinner();
                     break;

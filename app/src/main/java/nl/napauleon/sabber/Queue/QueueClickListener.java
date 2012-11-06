@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,21 +14,23 @@ import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetHandler;
+import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static nl.napauleon.sabber.Constants.*;
 
 public class QueueClickListener implements AdapterView.OnItemClickListener{
 
     private List<QueueInfo> queueItems;
     private List<String> categories;
     private Context context;
-    private HttpGetHandler httpGetHandler;
+    private Handler httpGetHandler;
 
     public void onItemClick(final AdapterView<?> adapterView, View view, int i, long l) {
-        httpGetHandler = new HttpGetHandler(new QueueClickCallback());
+        httpGetHandler = new Handler(new QueueClickCallback());
         final QueueInfo queueInfo = queueItems.get((int) l);
         context = adapterView.getContext();
         final SharedPreferences preferences = new ContextHelper().checkAndGetSettings(context);
@@ -75,8 +78,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
                 .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                httpGetHandler.executeRequest(
-                                        new SabNzbConnectionHelper(preferences).createChangeCategoryConnectionString(queueInfo.getId(), categories.get(i)));
+                                new HttpGetTask(httpGetHandler).execute(new SabNzbConnectionHelper(preferences).createChangeCategoryConnectionString(queueInfo.getId(), categories.get(i)));
                             }
                         });
     }
@@ -84,8 +86,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
     private DialogInterface.OnClickListener createDeleteClickListener(final QueueInfo queueInfo, final SharedPreferences preferences) {
         return new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        httpGetHandler.executeRequest(
-                                new SabNzbConnectionHelper(preferences).createDeleteItemConnectionString(queueInfo.getId()));
+                        new HttpGetTask(httpGetHandler).execute(new SabNzbConnectionHelper(preferences).createDeleteItemConnectionString(queueInfo.getId()));
                     }
                 };
     }
@@ -116,13 +117,13 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case HttpGetHandler.MSG_CONNECTIONTIMEOUT:
+                case MSG_CONNECTIONTIMEOUT:
                     new ContextHelper().showConnectionTimeoutAlert(context);
                     break;
-                case HttpGetHandler.MSG_CONNECTIONERROR:
+                case MSG_CONNECTIONERROR:
                     new ContextHelper().showConnectionErrorAlert(context);
                     break;
-                case HttpGetHandler.MSG_RESULT:
+                case MSG_RESULT:
                     Intent intent = new Intent(context, MainActivity.class);
                     context.startActivity(intent);
                     break;
