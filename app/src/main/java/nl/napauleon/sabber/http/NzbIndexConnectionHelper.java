@@ -55,7 +55,7 @@ public class NzbIndexConnectionHelper {
             }
             Element enclosure = (Element) item.getElementsByTagName("enclosure").item(0);
             String link = enclosure.getAttribute("url");
-            Long size = new Long(enclosure.getAttribute("length")) / 1024 / 1024;
+            Long size = Long.valueOf(enclosure.getAttribute("length")) / 1024 / 1024;
             results.add(new NzbInfo(title, link, size + "MB"));
         }
         return results;
