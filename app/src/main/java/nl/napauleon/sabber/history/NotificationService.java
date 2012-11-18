@@ -1,6 +1,18 @@
 package nl.napauleon.sabber.history;
 
-import android.app.Notification;
+import java.util.Date;
+import java.util.List;
+
+import nl.napauleon.sabber.Constants;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.SettingsActivity;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetTask;
+
+import org.json.JSONException;
+
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -10,53 +22,56 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.*;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.IBinder;
 import android.os.Process;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import nl.napauleon.sabber.*;
-import nl.napauleon.sabber.http.HttpGetTask;
-import org.json.JSONException;
-
-import java.util.List;
-
-import static nl.napauleon.sabber.Constants.MSG_RESULT;
 
 public class NotificationService extends Service {
 
     public static final int POLLING_INTERVAL = 5000;
     public static final String TAG = "NotificationService";
 
-    private NotificationService.ServiceHandler serviceHandler;
+    private Handler serviceHandler;
     private Runnable pollingThread;
-    private long last_polling_event;
-    private Handler httpHandler;
     private PendingIntent notificationIntent;
     private final int notificationId = 100;
+    
+    boolean notificationsEnabled = false;
 
     @Override
     public void onCreate() {
         HandlerThread notificationThread = new HandlerThread("NotificationThread", Process.THREAD_PRIORITY_BACKGROUND);
         notificationThread.start();
-        serviceHandler = new ServiceHandler(notificationThread.getLooper());
-        httpHandler = new Handler(new HistoryCallback());
-
         notificationIntent = PendingIntent.getActivity(NotificationService.this, 0, new Intent(getBaseContext(), MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "Notification Service starting");
-        last_polling_event = PreferenceManager.getDefaultSharedPreferences(this).getLong(Constants.LAST_POLLING_EVENT_PREF, System.currentTimeMillis());
-        pollingThread = new Runnable() {
+    	serviceHandler = new Handler();
+    	Log.d(TAG, "Notification Service starting");
+    	notificationsEnabled = true;
+    	new ContextHelper().updateLastPollingEvent(NotificationService.this);
+    	pollingThread = new Runnable() {
             public void run() {
-                serviceHandler.sendMessage(serviceHandler.obtainMessage());
-                serviceHandler.postDelayed(pollingThread, POLLING_INTERVAL);
+            		ConnectivityManager connectivityService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = connectivityService.getActiveNetworkInfo();
+                    if (notificationsEnabled = true && networkInfo != null && networkInfo.isConnected()) {
+                    	new HttpGetTask(new HistoryCallback()).execute(createHistoryConnectionString());
+    	                serviceHandler.postDelayed(this, POLLING_INTERVAL);
+            	}
             }
         };
         serviceHandler.postDelayed(pollingThread, POLLING_INTERVAL);
         return START_STICKY;
     }
+
+	private long getLastPollingEvent() {
+		return PreferenceManager.getDefaultSharedPreferences(this).getLong(Constants.LAST_POLLING_EVENT_PREF, 0L);
+	}
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -67,80 +82,61 @@ public class NotificationService extends Service {
     @Override
     public void onDestroy() {
         serviceHandler.removeCallbacks(pollingThread);
+        notificationsEnabled = false;
         Log.d(TAG, "Notification Service stopped");
+    }
+    
+    String createHistoryConnectionString() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NotificationService.this);
+        return String.format("http://%s:%s/api?mode=history&limit=5&output=json&apikey=%s",
+                preferences.getString(SettingsActivity.HOSTNAME_PREF, ""),
+                preferences.getString(SettingsActivity.PORT_PREF, ""),
+                preferences.getString(SettingsActivity.APIKEY_PREF, ""));
     }
 
     private boolean notifyDownloadedItem(HistoryInfo historyItem) {
 
-        long itemDateDownloaded = historyItem.getDateDownloaded().getTime();
-        boolean shouldNotify = last_polling_event < itemDateDownloaded;
-        Log.d(TAG, String.format("ShouldNotify: %s. last polling event: %s. item downloaded %s",
-                shouldNotify, last_polling_event, itemDateDownloaded));
+        Date itemDateDownloaded = historyItem.getDateDownloaded();
+        Date lastPollingEvent = new Date(getLastPollingEvent());
+		boolean shouldNotify = lastPollingEvent.before(itemDateDownloaded);
+        Log.d(TAG, String.format("ShouldNotify about %s: %s. last polling event: %tT. item downloaded %tT",
+                historyItem.getItem(), shouldNotify,  lastPollingEvent, itemDateDownloaded));
         return shouldNotify;
     }
 
     private void sendNotification(HistoryInfo historyItem) {
         Log.i(TAG, "Sending notification for item " + historyItem.getItem());
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Notification notification = new Notification.Builder(this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentIntent(notificationIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("Nzb download complete")
                 .setContentText(historyItem.getItem() + " download complete.")
-                .setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION))
-                .getNotification();
-        notificationManager.notify(notificationId, notification);
+                .setSound(RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_NOTIFICATION));
+        notificationManager.notify(notificationId, builder.build());
     }
+    
+    private class HistoryCallback extends DefaultErrorCallback {
+		public void handleError(String error) {
+			Log.w(TAG, error);
+		}
 
-    private final class ServiceHandler extends Handler {
+		public void handleTimeout() {
+			Log.w(TAG, "connection timeout from notificationservice");
+		}
 
-        public ServiceHandler(Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            Log.d(TAG, "Polling message received.");
-            ConnectivityManager connectivityService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connectivityService.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-                new HttpGetTask(httpHandler).execute(createHistoryConnectionString());
-            }
-        }
-
-        String createHistoryConnectionString() {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NotificationService.this);
-            return String.format("http://%s:%s/api?mode=history&limit=5&output=json&apikey=%s",
-                    preferences.getString(Settings.HOSTNAME_PREF, ""),
-                    preferences.getString(Settings.PORT_PREF, ""),
-                    preferences.getString(Settings.APIKEY_PREF, ""));
-        }
-    }
-
-    private class HistoryCallback implements Handler.Callback {
-
-        public boolean handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_RESULT:
-                    handleResult(msg);
-                    return true;
-            }
-            return false;
-        }
-
-        private void handleResult(Message msg) {
-            try {
-                List<HistoryInfo> historyItems = HistoryInfo.createHistoryList((String) msg.obj);
+		public void handleResponse(String response) {
+			try {
+                List<HistoryInfo> historyItems = HistoryInfo.createHistoryList(response);
                 for (HistoryInfo historyItem : historyItems) {
                     if (notifyDownloadedItem(historyItem)) {
                         sendNotification(historyItem);
-                        last_polling_event = new ContextHelper().updateLastPollingEvent(NotificationService.this);
+                        new ContextHelper().updateLastPollingEvent(NotificationService.this);
                     }
                 }
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing history information", e);
             }
-        }
-
+		}
     }
 }

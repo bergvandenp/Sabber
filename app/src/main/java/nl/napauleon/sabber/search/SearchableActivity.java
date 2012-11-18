@@ -1,5 +1,21 @@
 package nl.napauleon.sabber.search;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.SettingsActivity;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.NzbIndexConnectionHelper;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
+
+import org.xml.sax.SAXException;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -10,8 +26,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -19,21 +33,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.Settings;
-import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.NzbIndexConnectionHelper;
-import nl.napauleon.sabber.http.SabNzbConnectionHelper;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static nl.napauleon.sabber.Constants.MSG_RESULT;
 
 public class SearchableActivity extends ListActivity {
     private static final String TAG = "SearchableActivity";
@@ -45,7 +44,7 @@ public class SearchableActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        httpGetTask = new HttpGetTask(new Handler(new SearchCallback()));
+        httpGetTask = new HttpGetTask(new SearchCallback());
         setContentView(R.layout.itemlist);
         Intent intent = getIntent();
         if (intent != null) {
@@ -72,7 +71,7 @@ public class SearchableActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.menu_settings:
                 Intent settingsActivity = new Intent(getBaseContext(),
-                        Settings.class);
+                        SettingsActivity.class);
                 startActivity(settingsActivity);
                 return true;
             case R.id.menu_search:
@@ -97,44 +96,46 @@ public class SearchableActivity extends ListActivity {
         if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
             httpGetTask.cancel(true);
         }
+        httpGetTask = new HttpGetTask(new SearchCallback());
         httpGetTask.execute(searchString);
     }
 
     public class SearchCallback extends DefaultErrorCallback {
-        protected SearchCallback() {
-            super(SearchableActivity.this);
-        }
 
-        public boolean handleMessage(Message msg) {
-            if (!super.handleMessage(msg)) {
-                switch (msg.what) {
-                    case MSG_RESULT:
-                        List<NzbInfo> results = parseResults(msg);
-                        setListAdapter(new SearchListAdapter(SearchableActivity.this, results));
-                        getListView().setOnItemClickListener(new SearchClickListener(results));
-                        break;
-                    default:
-                        return false;
-                }
-            } else {
-                new AlertDialog.Builder(SearchableActivity.this)
-                        .setTitle("Cannot connect to search provider")
-                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                SearchableActivity.this.finish();
-                            }
-                        })
-                        .show();
-            }
+		public void handleError(String error) {
+			showErrorDialog();
+		}
+
+		public void handleTimeout() {
+			showErrorDialog();
+		}
+		
+		public void handleResponse(String response) {
+			List<NzbInfo> results = parseResults(response);
+            setListAdapter(new SearchListAdapter(SearchableActivity.this, results));
+            getListView().setOnItemClickListener(new SearchClickListener(results));
             if (dialog != null) {
                 dialog.dismiss();
             }
-            return true;
-        }
+		}
 
-        private List<NzbInfo> parseResults(Message msg) {
+		private void showErrorDialog() {
+			if (dialog != null) {
+				dialog.dismiss();
+			}
+			new AlertDialog.Builder(SearchableActivity.this)
+			.setTitle("Cannot connect to search provider")
+			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					SearchableActivity.this.finish();
+				}
+			})
+			.show();
+		}
+		
+		private List<NzbInfo> parseResults(String result) {
             try {
-                return nzbIndexConnectionHelper.parseResults((String) msg.obj);
+                return nzbIndexConnectionHelper.parseResults(result);
             } catch (IOException e) {
                 handleParseException(e);
             } catch (SAXException e) {
@@ -154,10 +155,8 @@ public class SearchableActivity extends ListActivity {
     private class SearchClickListener implements AdapterView.OnItemClickListener {
 
         private final List<NzbInfo> results;
-        private Handler httpTask;
 
         private SearchClickListener(List<NzbInfo> results) {
-            httpTask = new Handler(new SearchClickCallback());
             this.results = results;
         }
 
@@ -172,7 +171,7 @@ public class SearchableActivity extends ListActivity {
                                     SharedPreferences preferences = new ContextHelper().checkAndGetSettings(context);
                                     if (preferences != null) {
                                         String connectionString = new SabNzbConnectionHelper(preferences).createAddUrlConnectionString(results.get(position));
-                                        new HttpGetTask(httpTask).execute(connectionString);
+                                        new HttpGetTask(new SearchClickCallback()).execute(connectionString);
                                     }
                                 }
                             })
@@ -187,27 +186,19 @@ public class SearchableActivity extends ListActivity {
 
         private class SearchClickCallback extends DefaultErrorCallback {
 
-            private SearchClickCallback() {
-                super(SearchableActivity.this);
-            }
+			public void handleResponse(String response) {
+				SearchableActivity.this.finish();
+			}
 
-            @Override
-            public boolean handleMessage(Message msg) {
-                boolean messageHandled = super.handleMessage(msg);
-                if (!messageHandled) {
-                    switch (msg.what) {
-                        case MSG_RESULT:
-                            SearchableActivity.this.finish();
-                            return true;
-                        default:
-                            return false;
-                    }
-                } else {
-                    SearchableActivity.this.finish();
-                    return true;
-                }
-            }
+			public void handleTimeout() {
+				super.handleTimeout(SearchableActivity.this);
+				
+			}
 
+			public void handleError(String error) {
+				super.handleError(SearchableActivity.this, error);
+				
+			}
         }
     }
 }

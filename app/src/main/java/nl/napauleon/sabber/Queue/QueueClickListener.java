@@ -1,36 +1,33 @@
 package nl.napauleon.sabber.queue;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Message;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import java.util.Arrays;
+import java.util.List;
+
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static nl.napauleon.sabber.Constants.*;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 public class QueueClickListener implements AdapterView.OnItemClickListener{
 
     private List<QueueInfo> queueItems;
     private List<String> categories;
     private Context context;
-    private Handler httpGetHandler;
+	private QueueClickCallback queueClickCallback;
+    
 
     public void onItemClick(final AdapterView<?> adapterView, View view, int i, long l) {
-        httpGetHandler = new Handler(new QueueClickCallback());
+        queueClickCallback = new QueueClickCallback();
         final QueueInfo queueInfo = queueItems.get((int) l);
         context = adapterView.getContext();
         final SharedPreferences preferences = new ContextHelper().checkAndGetSettings(context);
@@ -78,7 +75,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
                 .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                new HttpGetTask(httpGetHandler).execute(new SabNzbConnectionHelper(preferences).createChangeCategoryConnectionString(queueInfo.getId(), categories.get(i)));
+                                new HttpGetTask(queueClickCallback).execute(new SabNzbConnectionHelper(preferences).createChangeCategoryConnectionString(queueInfo.getId(), categories.get(i)));
                             }
                         });
     }
@@ -86,7 +83,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
     private DialogInterface.OnClickListener createDeleteClickListener(final QueueInfo queueInfo, final SharedPreferences preferences) {
         return new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        new HttpGetTask(httpGetHandler).execute(new SabNzbConnectionHelper(preferences).createDeleteItemConnectionString(queueInfo.getId()));
+                        new HttpGetTask(queueClickCallback).execute(new SabNzbConnectionHelper(preferences).createDeleteItemConnectionString(queueInfo.getId()));
                     }
                 };
     }
@@ -110,28 +107,19 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
     }
 
     private class QueueClickCallback extends DefaultErrorCallback {
-        private QueueClickCallback() {
-            super(context);
-        }
 
-        @Override
-        public boolean handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_CONNECTIONTIMEOUT:
-                    new ContextHelper().showConnectionTimeoutAlert(context);
-                    break;
-                case MSG_CONNECTIONERROR:
-                    new ContextHelper().showConnectionErrorAlert(context);
-                    break;
-                case MSG_RESULT:
-                    Intent intent = new Intent(context, MainActivity.class);
-                    context.startActivity(intent);
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
+		public void handleResponse(String response) {
+			Intent intent = new Intent(context, MainActivity.class);
+            context.startActivity(intent);
+		}
 
+		public void handleTimeout() {
+			super.handleTimeout(context);
+		}
+
+		public void handleError(String error) {
+			super.handleError(context, error);
+			
+		}
     }
 }

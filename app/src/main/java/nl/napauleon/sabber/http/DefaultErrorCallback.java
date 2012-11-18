@@ -1,29 +1,16 @@
 package nl.napauleon.sabber.http;
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import nl.napauleon.sabber.ContextHelper;
+import android.content.Context;
 
-import static nl.napauleon.sabber.Constants.*;
+public abstract class DefaultErrorCallback implements HttpCallback{
 
-public class DefaultErrorCallback implements Handler.Callback{
 
-    private Context context;
+	public void handleError(Context context, String error) {
+		new ContextHelper().showErrorAlert(context, error);
+	}
 
-    public DefaultErrorCallback(Context context) {
-        this.context = context;
-    }
-
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case MSG_CONNECTIONTIMEOUT:
-                new ContextHelper().showConnectionTimeoutAlert(context);
-                return true;
-            case MSG_CONNECTIONERROR:
-                new ContextHelper().showConnectionErrorAlert(context);
-                return true;
-        }
-        return false;
-    }
+	public void handleTimeout(Context context) {
+		new ContextHelper().showConnectionTimeoutAlert(context);
+	}
 }

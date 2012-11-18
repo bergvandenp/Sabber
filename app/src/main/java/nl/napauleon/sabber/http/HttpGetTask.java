@@ -1,9 +1,12 @@
 package nl.napauleon.sabber.http;
 
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.util.Log;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import nl.napauleon.sabber.Constants;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -13,23 +16,17 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import android.os.AsyncTask;
+import android.util.Log;
 
 public class HttpGetTask extends AsyncTask<String, Void, String> {
 
     private static final String TAG = Constants.TAG + ".HttpGetTask";
 
-    public Handler getHandler() {
-        return handler;
-    }
+	private HttpCallback callback;
 
-    private Handler handler;
-
-    public HttpGetTask(Handler handler) {
-        this.handler = handler;
+    public HttpGetTask(HttpCallback callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -46,31 +43,26 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             if(response.getStatusLine().getStatusCode() == 200 && content != null) {
                 return (inputStreamToString(content)).toString();
             } else {
-                notifyFrontend(request, Constants.MSG_CONNECTIONERROR);
+            	Log.w(TAG, "no response for request " + request);
             }
 
         } catch (ConnectTimeoutException e) {
             Log.w(TAG, "Connection timed out for uri " + request);
-            notifyFrontend(request, Constants.MSG_CONNECTIONTIMEOUT);
         } catch (ClientProtocolException e) {
             Log.e(TAG, "Http error occured", e);
-            notifyFrontend(request, Constants.MSG_CONNECTIONTIMEOUT);
         } catch (IOException e) {
-            if (e.getMessage().startsWith("Connection to ")) {
+            if (e.getMessage() != null && e.getMessage().startsWith("Connection to ")) {
                 Log.w(TAG, "Failed to connect to " + request);
             } else {
                 Log.e(TAG, "IO exception occured", e);
             }
-            notifyFrontend(request, Constants.MSG_CONNECTIONTIMEOUT);
         }
         return null;
     }
 
-    private void notifyFrontend(String request, int what) {
+    private void notifyFrontendAboutError() {
         if (!isCancelled()) {
-            handler.sendMessage(handler.obtainMessage(what));
-        } else {
-            Log.i(TAG, "Http Task cancelled for request: " + request);
+            callback.handleError("Error connecting with sabnzbd");
         }
     }
 
@@ -91,7 +83,9 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
 		try {
             Log.i(TAG, "Http result: " + result);
             if(result != null) {
-                handler.sendMessage(handler.obtainMessage(Constants.MSG_RESULT, result));
+            	callback.handleResponse(result);
+            } else {
+            	notifyFrontendAboutError();
             }
 		} catch (ClassCastException e) {
             Log.e(TAG, "No valid response from the downloadserver", e);

@@ -1,36 +1,38 @@
 package nl.napauleon.sabber.history;
 
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.SherlockListFragment;
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.SabNzbConnectionHelper;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static nl.napauleon.sabber.Constants.MSG_RESULT;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpCallback;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
+
+import org.json.JSONException;
+
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockListFragment;
 
 public class HistoryFragment extends SherlockListFragment{
 
     private List<HistoryInfo> historyItems;
     private HttpGetTask httpGetTask;
+	private HttpCallback callback = new HistoryFragmentCallback();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        httpGetTask = new HttpGetTask(new Handler(new HistoryFragmentCallback()));
+        
+		httpGetTask = new HttpGetTask(callback);
     }
 
     @Override
@@ -52,40 +54,39 @@ public class HistoryFragment extends SherlockListFragment{
             if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
                 httpGetTask.cancel(true);
             }
-            httpGetTask = new HttpGetTask(httpGetTask.getHandler());
+            httpGetTask = new HttpGetTask(callback);
             httpGetTask.execute(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
         }
     }
 
     public class HistoryFragmentCallback extends DefaultErrorCallback {
         public HistoryFragmentCallback() {
-            super(HistoryFragment.this.getActivity());
+            super();
         }
 
-        public boolean handleMessage(Message msg) {
-            boolean messageHandled = super.handleMessage(msg);
-            if (messageHandled) {
-                stopSpinner();
-                return true;
-            }
-            switch (msg.what) {
-                case MSG_RESULT:
-                    handleResult(msg);
-                    stopSpinner();
-                    break;
-            }
-            return messageHandled;
-        }
+		public void handleError(String error) {
+        	stopSpinner();
+			super.handleError(HistoryFragment.this.getActivity(), error);
+		}
 
-        private void handleResult(Message msg) {
+		public void handleTimeout() {
+			stopSpinner();
+			super.handleTimeout(HistoryFragment.this.getActivity());
+		}
+		
+		public void handleResponse(String response) {
+			stopSpinner();
+			handleResult(response);
+		}
+
+        private void handleResult(String response) {
             ContextHelper contextHelper = new ContextHelper();
-            String messageText = (String) msg.obj;
             try {
-                historyItems = HistoryInfo.createHistoryList(messageText);
+                historyItems = HistoryInfo.createHistoryList(response);
                 contextHelper.updateLastPollingEvent(getActivity());
                 setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
             } catch (JSONException e) {
-                contextHelper.handleJsonException(getActivity(), messageText, e);
+                contextHelper.handleJsonException(getActivity(), response, e);
             }
         }
     }

@@ -2,7 +2,7 @@ package nl.napauleon.sabber.http;
 
 import android.content.SharedPreferences;
 import android.util.Log;
-import nl.napauleon.sabber.Settings;
+import nl.napauleon.sabber.SettingsActivity;
 import nl.napauleon.sabber.search.NzbInfo;
 
 import java.io.UnsupportedEncodingException;
@@ -18,9 +18,9 @@ public class SabNzbConnectionHelper {
     private final String host, port, apikey;
 
     public SabNzbConnectionHelper(SharedPreferences preferences) {
-        host = preferences.getString(Settings.HOSTNAME_PREF, "");
-        port = preferences.getString(Settings.PORT_PREF, "");
-        apikey = preferences.getString(Settings.APIKEY_PREF, "");
+        host = preferences.getString(SettingsActivity.HOSTNAME_PREF, "");
+        port = preferences.getString(SettingsActivity.PORT_PREF, "");
+        apikey = preferences.getString(SettingsActivity.APIKEY_PREF, "");
     }
 
     public String createAddUrlConnectionString(NzbInfo nzbInfo) {

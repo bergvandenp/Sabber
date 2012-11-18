@@ -1,25 +1,32 @@
 package nl.napauleon.sabber.queue;
 
-import android.content.SharedPreferences;
-import android.os.*;
-import android.preference.PreferenceManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.SherlockListFragment;
-import nl.napauleon.sabber.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.SettingsActivity;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.http.SabnzbResultHelper;
 import nl.napauleon.sabber.search.GlobalInfo;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static nl.napauleon.sabber.Constants.MSG_RESULT;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockListFragment;
 
 public class DownloadingFragment extends SherlockListFragment {
 
@@ -41,7 +48,7 @@ public class DownloadingFragment extends SherlockListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         itemClickListener = new QueueClickListener();
-        httpGetTask = new HttpGetTask(new Handler(new DownloadingCallback()));
+        httpGetTask = new HttpGetTask(new DownloadingCallback());
     }
 
     @Override
@@ -70,9 +77,9 @@ public class DownloadingFragment extends SherlockListFragment {
     public void onResume() {
         super.onResume();
         preferences = new ContextHelper().checkAndGetSettings(getActivity());
-        refreshrate = Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(Settings.REFRESHRATE_PREF, "0"));
-        if (refreshrate > 0) {
-            backgroundHandler.postDelayed(backgroundUpdater, refreshrate * 1000);
+        String refreshratePref = PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(SettingsActivity.REFRESHRATE_PREF, "0");
+        if (StringUtils.isNotBlank(refreshratePref) && Integer.parseInt(refreshratePref) > 0) {
+        		backgroundHandler.postDelayed(backgroundUpdater, Integer.parseInt(refreshratePref) * 1000);
         } else {
             retrieveQueueData();
         }
@@ -96,33 +103,34 @@ public class DownloadingFragment extends SherlockListFragment {
             if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
                 httpGetTask.cancel(true);
             }
-            httpGetTask = new HttpGetTask(httpGetTask.getHandler());
+            httpGetTask = new HttpGetTask(new DownloadingCallback());
             httpGetTask.execute(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
         }
     }
 
     public class DownloadingCallback extends DefaultErrorCallback {
         public DownloadingCallback() {
-            super(DownloadingFragment.this.getActivity());
+            super();
         }
+        
+		public void handleError(String error) {
+			super.handleError(DownloadingFragment.this.getActivity(), error);
+			stopSpinner();
+		}
 
-        public boolean handleMessage(Message msg) {
-            boolean messageHandled = super.handleMessage(msg);
-            if (messageHandled) {
-                stopSpinner();
-                return true;
-            }
-            switch (msg.what) {
-                case MSG_RESULT:
-                    handleResult(msg);
-                    stopSpinner();
-                    break;
-            }
-            return messageHandled;
-        }
+		public void handleTimeout() {
+			super.handleTimeout(DownloadingFragment.this.getActivity());
+			stopSpinner();
+		}
 
-        private void handleResult(Message msg) {
-            SabnzbResultHelper sabnzbResultHelper = new SabnzbResultHelper((String) msg.obj);
+		public void handleResponse(String response) {
+			stopSpinner();
+			handleResult(response);
+			
+		}
+
+        private void handleResult(String result) {
+            SabnzbResultHelper sabnzbResultHelper = new SabnzbResultHelper(result);
             togglePause(sabnzbResultHelper.isPaused());
 
             queueItems = sabnzbResultHelper.parseQueueItems();
