@@ -1,42 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
-            android:defaultValue=""
-            android:title="@string/hostname"
-            android:key="hostnamePref"
-            android:inputType="textUri"
-            android:name="Hostname Preference"/>
+        android:name="Hostname Preference"
+        android:defaultValue=""
+        android:inputType="textUri"
+        android:key="hostnamePref"
+        android:title="@string/hostname" />
     <EditTextPreference
-            android:summary="@string/port"
-            android:defaultValue="8080"
-            android:title="@string/port"
-            android:key="portPref"
-            android:inputType="number"
-            android:name="Port Preference"/>
+        android:name="Port Preference"
+        android:defaultValue="8080"
+        android:inputType="number"
+        android:key="portPref"
+        android:title="@string/port" />
     <EditTextPreference
-            android:summary="@string/apikey"
-            android:title="@string/apikey"
-            android:defaultValue=""
-            android:key="apikeyPref"
-            android:inputType="text"
-            android:name="Apikey Preference"/>
+        android:name="Apikey Preference"
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="apikeyPref"
+        android:title="@string/apikey" />
     <EditTextPreference
-            android:summary="@string/pref_refresh_rate_summary"
-            android:title="@string/pref_refresh_rate_title"
-            android:key="refreshratePref"
-            android:inputType="number"
-            android:name="Refresh rate Preference"/>
+        android:name="Refresh rate Preference"
+        android:inputType="number"
+        android:key="refreshratePref"
+        android:summary="@string/pref_refresh_rate_summary"
+        android:title="@string/pref_refresh_rate_title" />
     <EditTextPreference
-            android:summary="@string/pref_min_size_summary"
-            android:title="@string/pref_min_size_title"
-            android:key="minsizePref"
-            android:inputType="number"
-            android:name="Minimal size Preference"/>
+        android:name="Minimal size Preference"
+        android:inputType="number"
+        android:key="minsizePref"
+        android:summary="@string/pref_min_size_summary"
+        android:title="@string/pref_min_size_title" />
+
     <CheckBoxPreference
-            android:summary="@string/pref_notifications_summary"
-            android:title="@string/pref_notifications_title"
-            android:key="notificationsPref"
-            android:name="Notifications Preference"/>
+        android:name="Notifications Preference"
+        android:key="notificationsPref"
+        android:summary="@string/pref_notifications_summary"
+        android:title="@string/pref_notifications_title" />
 
 </PreferenceScreen>

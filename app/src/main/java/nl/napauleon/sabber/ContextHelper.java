@@ -21,9 +21,9 @@ public class ContextHelper {
 
     public boolean isSabnzbSettingsPresent(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String hostname = prefs.getString(Settings.HOSTNAME_PREF, "");
-        String port = prefs.getString(Settings.PORT_PREF, "");
-        String apikey = prefs.getString(Settings.APIKEY_PREF, "");
+        String hostname = prefs.getString(SettingsActivity.HOSTNAME_PREF, "");
+        String port = prefs.getString(SettingsActivity.PORT_PREF, "");
+        String apikey = prefs.getString(SettingsActivity.APIKEY_PREF, "");
 
         return hostname != null && !hostname.equals("")
                 && port != null && !port.equals("")
@@ -32,7 +32,7 @@ public class ContextHelper {
 
     public boolean isNotificationsEnabled(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(Settings.NOTIFICATIONS_PREF, false);
+        return prefs.getBoolean(Constants.NOTIFICATIONS_PREF, false);
     }
 
     public long updateLastPollingEvent(Context context) {

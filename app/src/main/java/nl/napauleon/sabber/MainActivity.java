@@ -1,23 +1,20 @@
 package nl.napauleon.sabber;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import nl.napauleon.sabber.history.HistoryFragment;
 import nl.napauleon.sabber.history.NotificationService;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.queue.DownloadingFragment;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 
-import static nl.napauleon.sabber.Constants.*;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 public class MainActivity extends SherlockFragmentActivity {
 
@@ -40,7 +37,7 @@ public class MainActivity extends SherlockFragmentActivity {
         setSupportProgressBarIndeterminateVisibility(false);
         ContextHelper contextHelper = new ContextHelper();
         if (!contextHelper.isSabnzbSettingsPresent(this)) {
-            Intent settingsActivity = new Intent(this, Settings.class);
+            Intent settingsActivity = new Intent(this, SettingsActivity.class);
             startActivity(settingsActivity);
         }
         if (contextHelper.isNotificationsEnabled(this)){
@@ -126,7 +123,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 return true;
             case R.id.menu_settings:
                 Intent settingsActivity = new Intent(getBaseContext(),
-                        Settings.class);
+                        SettingsActivity.class);
                 startActivity(settingsActivity);
                 return true;
             case R.id.menu_refresh:
@@ -155,28 +152,24 @@ public class MainActivity extends SherlockFragmentActivity {
             } else {
                 message = connectionHelper.createPauseConnection();
             }
-            new HttpGetTask(new Handler(new MainCallback())).execute(message);
+            new HttpGetTask(new MainCallback()).execute(message);
         }
     }
 
     private class MainCallback extends DefaultErrorCallback {
 
-        private MainCallback() {
-            super(MainActivity.this);
-        }
+		public void handleResponse(String response) {
+			paused = !paused;
+            invalidateOptionsMenu();
+		}
 
-        @Override
-        public boolean handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_RESULT:
-                    paused = !paused;
-                    invalidateOptionsMenu();
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
+		public void handleTimeout() {
+			super.handleTimeout(MainActivity.this);
+		}
+
+		public void handleError(String error) {
+			super.handleError(MainActivity.this, error);
+		}
 
     }
 }
