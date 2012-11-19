@@ -1,21 +1,22 @@
 package nl.napauleon.sabber.history;
 
-import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import com.xtremelabs.robolectric.Robolectric;
-import com.xtremelabs.robolectric.shadows.ShadowToast;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import nl.napauleon.sabber.CustomTestRunner;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.Utils;
 import nl.napauleon.sabber.shadow.MyShadowFragmentActivity;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+
+import com.xtremelabs.robolectric.Robolectric;
+import com.xtremelabs.robolectric.shadows.ShadowToast;
 
 @RunWith(CustomTestRunner.class)
 public class HistoryFragmentTest {
@@ -45,9 +46,9 @@ public class HistoryFragmentTest {
 
     @Test
     public void testHandleHistoryResult() throws Exception {
-        Message message = Utils.createResultMessage("historyresult");
+        String message = Utils.readFileToString("historyresult");
         
-        fragment.new HistoryFragmentCallback().handleMessage(message);
+        fragment.new HistoryFragmentCallback().handleResponse(message);
 
         assertEquals(7, fragment.getHistoryItems().size());
         assertEquals("", fragment.getHistoryItems().get(0).getMessage());
@@ -55,9 +56,9 @@ public class HistoryFragmentTest {
 
     @Test
     public void testHandleHistoryResult_repair() throws Exception {
-        Message message = Utils.createResultMessage("historyresult_repair.json");
+        String message = Utils.readFileToString("historyresult_repair.json");
 
-        fragment.new HistoryFragmentCallback().handleMessage(message);
+        fragment.new HistoryFragmentCallback().handleResponse(message);
         
         assertEquals(1, fragment.getHistoryItems().size());
         HistoryInfo historyInfo = fragment.getHistoryItems().get(0);
@@ -67,9 +68,9 @@ public class HistoryFragmentTest {
 
     @Test
     public void testHandleHistoryResult_extract() throws Exception {
-        Message message = Utils.createResultMessage("historyresult_extract.json");
+        String message = Utils.readFileToString("historyresult_extract.json");
 
-        fragment.new HistoryFragmentCallback().handleMessage(message);
+        fragment.new HistoryFragmentCallback().handleResponse(message);
 
         assertEquals(1, fragment.getHistoryItems().size());
         HistoryInfo historyInfo = fragment.getHistoryItems().get(0);
@@ -78,9 +79,9 @@ public class HistoryFragmentTest {
 
     @Test
     public void testHandleHistoryResult_verify() throws Exception {
-        Message message = Utils.createResultMessage("historyresult_verify.json");
+        String message = Utils.readFileToString("historyresult_verify.json");
 
-        fragment.new HistoryFragmentCallback().handleMessage(message);
+        fragment.new HistoryFragmentCallback().handleResponse(message);
 
         assertEquals(1, fragment.getHistoryItems().size());
         HistoryInfo historyInfo = fragment.getHistoryItems().get(0);
@@ -89,9 +90,9 @@ public class HistoryFragmentTest {
 
     @Test
     public void testHandleHistoryResult_failed() throws Exception {
-        Message message = Utils.createResultMessage("historyresult_failed.json");
+    	String message = Utils.readFileToString("historyresult_failed.json");
 
-        fragment.new HistoryFragmentCallback().handleMessage(message);
+        fragment.new HistoryFragmentCallback().handleResponse(message);
 
         assertEquals(3, fragment.getHistoryItems().size());
         HistoryInfo historyInfo = fragment.getHistoryItems().get(2);

@@ -68,18 +68,18 @@ public class SearchableActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_settings:
-                Intent settingsActivity = new Intent(getBaseContext(),
-                        SettingsActivity.class);
-                startActivity(settingsActivity);
-                return true;
-            case R.id.menu_search:
-                this.onSearchRequested();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        int itemId = item.getItemId();
+		if (itemId == R.id.menu_settings) {
+			Intent settingsActivity = new Intent(getBaseContext(),
+			        SettingsActivity.class);
+			startActivity(settingsActivity);
+			return true;
+		} else if (itemId == R.id.menu_search) {
+			this.onSearchRequested();
+			return true;
+		} else {
+			return super.onOptionsItemSelected(item);
+		}
     }
 
     private void handleIntent(Intent intent) {

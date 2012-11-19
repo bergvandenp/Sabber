@@ -8,11 +8,6 @@ import android.preference.PreferenceActivity;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final String HOSTNAME_PREF = "hostnamePref";
-    public static final String PORT_PREF = "portPref";
-    public static final String APIKEY_PREF = "apikeyPref";
-    public static final String REFRESHRATE_PREF = "refreshratePref";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

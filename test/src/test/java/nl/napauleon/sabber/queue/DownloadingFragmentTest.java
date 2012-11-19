@@ -24,9 +24,9 @@ public class DownloadingFragmentTest {
 
     @Test
     public void testHandleQueueResult() throws Exception {
-        Message message = Utils.createResultMessage("queueresult");
+        String message = Utils.readFileToString("queueresult");
 
-        fragment.new DownloadingCallback().handleMessage(message);
+        fragment.new DownloadingCallback().handleResponse(message);
 
         List<QueueInfo> result = fragment.getQueueItems();
         assertEquals(1, result.size());

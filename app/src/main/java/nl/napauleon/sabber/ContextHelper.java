@@ -21,9 +21,9 @@ public class ContextHelper {
 
     public boolean isSabnzbSettingsPresent(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String hostname = prefs.getString(SettingsActivity.HOSTNAME_PREF, "");
-        String port = prefs.getString(SettingsActivity.PORT_PREF, "");
-        String apikey = prefs.getString(SettingsActivity.APIKEY_PREF, "");
+        String hostname = prefs.getString(Constants.HOSTNAME_PREF, "");
+        String port = prefs.getString(Constants.PORT_PREF, "");
+        String apikey = prefs.getString(Constants.APIKEY_PREF, "");
 
         return hostname != null && !hostname.equals("")
                 && port != null && !port.equals("")

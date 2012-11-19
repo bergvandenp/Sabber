@@ -47,7 +47,7 @@ public class ContextHelperTest {
     @Test
     public void testIsNotificationsEnabled_False() throws Exception {
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putBoolean(Settings.NOTIFICATIONS_PREF, false);
+        editor.putBoolean(Constants.NOTIFICATIONS_PREF, false);
         editor.commit();
         boolean result = helper.isNotificationsEnabled(context);
         assertFalse(result);
@@ -56,7 +56,7 @@ public class ContextHelperTest {
     @Test
     public void testIsNotificationsEnabled() throws Exception {
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putBoolean(Settings.NOTIFICATIONS_PREF, true);
+        editor.putBoolean(Constants.NOTIFICATIONS_PREF, true);
         editor.commit();
         boolean result = helper.isNotificationsEnabled(context);
         assertTrue(result);
@@ -72,8 +72,8 @@ public class ContextHelperTest {
     public void testCheckAndGetSettings_HostnameEmpty() throws Exception {
         helper.checkAndGetSettings(context);
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putString(Settings.APIKEY_PREF, "bla");
-        editor.putString(Settings.PORT_PREF, "portbla");
+        editor.putString(Constants.APIKEY_PREF, "bla");
+        editor.putString(Constants.PORT_PREF, "portbla");
         editor.commit();
         assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
@@ -82,8 +82,8 @@ public class ContextHelperTest {
     public void testCheckAndGetSettings_PortEmpty() throws Exception {
         helper.checkAndGetSettings(context);
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putString(Settings.APIKEY_PREF, "bla");
-        editor.putString(Settings.HOSTNAME_PREF, "hostbla");
+        editor.putString(Constants.APIKEY_PREF, "bla");
+        editor.putString(Constants.HOSTNAME_PREF, "hostbla");
         editor.commit();
         assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
@@ -92,8 +92,8 @@ public class ContextHelperTest {
     public void testCheckAndGetSettings_ApiKeyEmpty() throws Exception {
         helper.checkAndGetSettings(context);
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putString(Settings.HOSTNAME_PREF, "hostbla");
-        editor.putString(Settings.PORT_PREF, "portbla");
+        editor.putString(Constants.HOSTNAME_PREF, "hostbla");
+        editor.putString(Constants.PORT_PREF, "portbla");
         editor.commit();
         assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
@@ -101,9 +101,9 @@ public class ContextHelperTest {
     @Test
     public void testCheckAndGetSettings() throws Exception {
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putString(Settings.APIKEY_PREF, "bla");
-        editor.putString(Settings.HOSTNAME_PREF, "hostbla");
-        editor.putString(Settings.PORT_PREF, "portbla");
+        editor.putString(Constants.APIKEY_PREF, "bla");
+        editor.putString(Constants.HOSTNAME_PREF, "hostbla");
+        editor.putString(Constants.PORT_PREF, "portbla");
         editor.commit();
         helper.checkAndGetSettings(context);
 

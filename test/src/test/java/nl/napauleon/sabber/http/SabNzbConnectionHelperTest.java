@@ -1,16 +1,18 @@
 package nl.napauleon.sabber.http;
 
-import android.content.SharedPreferences;
-import com.xtremelabs.robolectric.shadows.ShadowPreferenceManager;
+import static org.junit.Assert.assertEquals;
+import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.CustomTestRunner;
 import nl.napauleon.sabber.MainActivity;
-import nl.napauleon.sabber.Settings;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
+import android.content.SharedPreferences;
+
+import com.xtremelabs.robolectric.shadows.ShadowPreferenceManager;
 
 @RunWith(CustomTestRunner.class)
 public class SabNzbConnectionHelperTest {
@@ -25,9 +27,9 @@ public class SabNzbConnectionHelperTest {
     public void setUp() throws Exception {
         SharedPreferences preferences = ShadowPreferenceManager.getDefaultSharedPreferences(new MainActivity());
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(Settings.HOSTNAME_PREF, HOSTNAME);
-        editor.putString(Settings.PORT_PREF, PORT);
-        editor.putString(Settings.APIKEY_PREF, APIKEY);
+        editor.putString(Constants.HOSTNAME_PREF, HOSTNAME);
+        editor.putString(Constants.PORT_PREF, PORT);
+        editor.putString(Constants.APIKEY_PREF, APIKEY);
         editor.commit();
         helper = new SabNzbConnectionHelper(preferences);
     }

@@ -3,17 +3,18 @@ package nl.napauleon.sabber.queue;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
+import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.SettingsActivity;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.http.SabnzbResultHelper;
 import nl.napauleon.sabber.search.GlobalInfo;
+
+import org.apache.commons.lang3.StringUtils;
+
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -77,7 +78,7 @@ public class DownloadingFragment extends SherlockListFragment {
     public void onResume() {
         super.onResume();
         preferences = new ContextHelper().checkAndGetSettings(getActivity());
-        String refreshratePref = PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(SettingsActivity.REFRESHRATE_PREF, "0");
+        String refreshratePref = PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(Constants.REFRESHRATE_PREF, "0");
         if (StringUtils.isNotBlank(refreshratePref) && Integer.parseInt(refreshratePref) > 0) {
         		backgroundHandler.postDelayed(backgroundUpdater, Integer.parseInt(refreshratePref) * 1000);
         } else {
