@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -59,7 +58,7 @@ public class NotificationService extends Service {
 				}
 			}
 		};
-		
+
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				Log.d(TAG, "Polling event occurred");
@@ -68,7 +67,7 @@ public class NotificationService extends Service {
 		}, 0, POLLING_INTERVAL);
 		return START_STICKY;
 	}
-	
+
 	boolean isNetworkConnected() {
 		ConnectivityManager connectivityService = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = connectivityService.getActiveNetworkInfo();
@@ -102,32 +101,47 @@ public class NotificationService extends Service {
 				preferences.getString(Constants.APIKEY_PREF, ""));
 	}
 
-	private boolean notifyDownloadedItem(HistoryInfo historyItem) {
+	boolean shouldNotify(HistoryInfo historyItem) {
 
 		Date itemDateDownloaded = historyItem.getDateDownloaded();
 		Date lastPollingEvent = new Date(getLastPollingEvent());
-		boolean shouldNotify = lastPollingEvent.before(itemDateDownloaded);
-		Log.d(TAG,
-				String.format(
-						"ShouldNotify about %s: %s. last polling event: %tT. item downloaded %tT",
-						historyItem.getItem(), shouldNotify, lastPollingEvent,
-						itemDateDownloaded));
+		boolean shouldNotify = historyItem.isProcessingComplete()
+				&& lastPollingEvent.before(itemDateDownloaded);
+		if (shouldNotify) {
+			Log.d(TAG,
+					String.format(
+							"ShouldNotify about %s. last polling event: %tT. item downloaded at: %tT",
+							historyItem.getItem(), lastPollingEvent, itemDateDownloaded));
+		}
 		return shouldNotify;
 	}
 
 	private void sendNotification(HistoryInfo historyItem) {
-		Log.i(TAG, "Sending notification for item " + historyItem.getItem());
+		Log.i(TAG,
+				"Sending notification for item " + historyItem.getItem()
+						+ " with downloaddate: "
+						+ historyItem.getDateDownloadedAsString());
 		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				this)
 				.setContentIntent(notificationIntent)
 				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle("Nzb download complete")
-				.setContentText(historyItem.getItem() + " download complete.")
+				.setContentTitle(getNotificationTitle(historyItem))
+				.setContentText(getNotificationContent(historyItem))
 				.setSound(
 						RingtoneManager.getActualDefaultRingtoneUri(this,
 								RingtoneManager.TYPE_NOTIFICATION));
 		notificationManager.notify(notificationId, builder.build());
+	}
+
+	private String getNotificationContent(HistoryInfo historyItem) {
+		return historyItem.getItem() + (historyItem.getStatus() == Status.Failed 
+				? " download failed." : " download complete.");
+	}
+
+	private String getNotificationTitle(HistoryInfo historyItem) {
+		return historyItem.getStatus() == Status.Failed ? "Nzb download failed"
+				: "Nzb download complete";
 	}
 
 	private class HistoryCallback extends DefaultErrorCallback {
@@ -144,7 +158,7 @@ public class NotificationService extends Service {
 				List<HistoryInfo> historyItems = HistoryInfo
 						.createHistoryList(response);
 				for (HistoryInfo historyItem : historyItems) {
-					if (notifyDownloadedItem(historyItem)) {
+					if (shouldNotify(historyItem)) {
 						sendNotification(historyItem);
 						new ContextHelper()
 								.updateLastPollingEvent(NotificationService.this);

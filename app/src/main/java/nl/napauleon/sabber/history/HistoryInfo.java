@@ -11,13 +11,15 @@ import java.util.Date;
 
 public class HistoryInfo {
 	private String item;
-	private Long dateDownloaded;
+	private Date dateDownloaded;
     private String message;
+    private Status status;
 
-    public HistoryInfo(String item, Long dateDownloaded, String message) {
+    public HistoryInfo(String item, Long dateDownloaded, Status status, String message) {
 		this.item = item;
-		this.dateDownloaded = dateDownloaded;
+		this.dateDownloaded = new Date(dateDownloaded*1000L);
         this.message = message;
+        this.status = status;
 	}
 
     public static ArrayList<HistoryInfo> createHistoryList(String jsonResponse) throws JSONException {
@@ -40,12 +42,17 @@ public class HistoryInfo {
 
         return new HistoryInfo(
                 slot.getString("nzb_name").replace(".nzb", ""),
-                slot.getLong("completed"),
+                slot.getLong("completed") * 1000L,
+                status,
                 status == Status.Failed ? slot.getString("fail_message") : slot.getString("action_line"));
     }
+    
+    public boolean isProcessingComplete() {
+		return status == Status.Completed || status == Status.Failed;
+	}
 
     public Date getDateDownloaded() {
-        return new Date(dateDownloaded*1000L);
+        return dateDownloaded;
     }
 
 	public String getDateDownloadedAsString() {
@@ -59,4 +66,10 @@ public class HistoryInfo {
     public String getMessage() {
         return message;
     }
+
+	public Status getStatus() {
+		return status;
+	}
+    
+    
 }
