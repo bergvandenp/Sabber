@@ -10,6 +10,7 @@
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:maxWidth="200dp"
+                android:text="@string/unavailable"
                 style="@style/CodeFont">
         </TextView>
 
@@ -19,6 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
+                android:text="@string/unavailable"
                 style="@style/CodeFont">
         </TextView>
     </TableRow>
@@ -29,6 +31,7 @@
                   android:padding="5dp"
                   android:textColor="@color/red"
                   android:textStyle="bold"
+                  android:text="@string/unavailable"
                   style="@style/CodeFont"/>
     </TableRow>
 
