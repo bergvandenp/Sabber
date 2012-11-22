@@ -1,11 +1,7 @@
 package nl.napauleon.sabber.http;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import nl.napauleon.sabber.Constants;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -16,18 +12,13 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
-public class HttpGetTask extends AsyncTask<String, Void, String> {
-
-    private static final String TAG = Constants.TAG + ".HttpGetTask";
-
-	private HttpCallback callback;
+public class HttpGetTask extends GetTask {
 
     public HttpGetTask(HttpCallback callback) {
-        this.callback = callback;
-    }
+		super(callback);
+	}
 
     @Override
     protected String doInBackground(String... strings) {
@@ -45,7 +36,6 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
             } else {
             	Log.w(TAG, "no response for request " + request);
             }
-
         } catch (ConnectTimeoutException e) {
             Log.w(TAG, "Connection timed out for uri " + request);
         } catch (ClientProtocolException e) {
@@ -60,12 +50,6 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
-    private void notifyFrontendAboutError() {
-        if (!isCancelled()) {
-            callback.handleError("Error connecting with sabnzbd");
-        }
-    }
-
     private HttpResponse executeRequest(String string) throws IOException {
         HttpResponse response;HttpParams httpParameters = new BasicHttpParams();
         // Set the timeout in milliseconds until a connection is established.
@@ -76,39 +60,5 @@ public class HttpGetTask extends AsyncTask<String, Void, String> {
         HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
         response = new DefaultHttpClient(httpParameters).execute(new HttpGet(string));
         return response;
-    }
-
-    @Override
-    public void onPostExecute(String result) {
-		try {
-            Log.i(TAG, "Http result: " + result);
-            if(result != null) {
-            	callback.handleResponse(result);
-            } else {
-            	notifyFrontendAboutError();
-            }
-		} catch (ClassCastException e) {
-            Log.e(TAG, "No valid response from the downloadserver", e);
-		}
-    }
-
-	private StringBuilder inputStreamToString(InputStream is) {
-        String line;
-        StringBuilder total = new StringBuilder();
-
-        // Wrap a BufferedReader around the InputStream
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-
-        // Read response until the end
-        try {
-            while ((line = rd.readLine()) != null) {
-                total.append(line);
-            }
-        } catch (IOException e) {
-            Log.e("Sabber", "Error reading inputstream", e);
-        }
-
-        // Return full string
-        return total;
     }
 }

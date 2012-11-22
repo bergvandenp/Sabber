@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
-    <application android:installLocation="auto" android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:theme="@style/Theme.Sherlock.Light" android:allowBackup="true">
+    <application android:name=".Sabber" android:installLocation="auto" android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:theme="@style/Theme.Sherlock.Light" android:allowBackup="true">
 
         <activity android:label="@string/app_name" android:name=".MainActivity" android:launchMode="singleTop">
             <intent-filter>
