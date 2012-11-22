@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<previews>
+
+    <preview
+        name="Galaxy Nexus"
+        config="layout-nl-sw360dp-w360dp-h640dp-normal-long-port-notnight-xhdpi-finger-keyssoft-nokeys-navhidden-nonav-1280x720-v17"
+        device="Galaxy Nexus"
+        devicestate="Portrait"
+        locale="nl"
+        target="Android 4.2"
+        theme="@style/Theme.Sherlock.Light" >
+    </preview>
+    <preview
+        name="Tablet"
+        config="layout-nl-sw800dp-w800dp-h1280dp-xlarge-long-port-notnight-mdpi-finger-keyssoft-nokeys-navhidden-nonav-1280x800-v17"
+        device="10.1in WXGA (Tablet)"
+        devicestate="Portrait"
+        locale="nl"
+        target="Android 4.2"
+        theme="@style/Theme.Sherlock.Light" >
+    </preview>
+
+</previews>

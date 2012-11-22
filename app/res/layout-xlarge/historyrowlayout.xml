@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#f1f1f1">
+                android:layout_height="match_parent">
     <LinearLayout
             android:id="@+id/namedaterow"
             android:layout_width="match_parent"
@@ -14,6 +13,7 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:maxWidth="600dp"
+                android:text="@string/unavailable"
                 android:textAppearance="@android:style/TextAppearance.Medium">
         </TextView>
 
@@ -23,6 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
+                android:text="@string/unavailable"
                 android:textAppearance="@android:style/TextAppearance.Medium">
         </TextView>
     </LinearLayout>
@@ -33,6 +34,7 @@
               android:textColor="@color/red"
               android:textStyle="bold"
               android:layout_below="@id/namedaterow"
+              android:text="@string/unavailable"
               style="@style/CodeFont"/>
 </RelativeLayout>
 
