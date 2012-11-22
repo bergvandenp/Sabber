@@ -26,15 +26,23 @@
     <string name="text_time_left">Time left:</string>
     <string name="text_speed">Current speed:</string>
 
+    <string name="notification_title_completed">Nzb download completed</string>
+    <string name="notification_title_failed">Nzb download failed</string>
+    <string name="notification_content_completed">%1$s download completed.</string>
+    <string name="notification_content_failed">%1$s download failed.</string>
+
+    <string name="advanced_pref">Advanced preferences</string>
     <string name="port">Port</string>
     <string name="apikey">Apikey</string>
     <string name="hostname">Hostname</string>
     <string name="pref_min_size_title">Minimal nzb size</string>
     <string name="pref_min_size_summary">Minimal nzb size in MB</string>
-    <string name="pref_refresh_rate_title">Refresh rate</string>
-    <string name="pref_refresh_rate_summary">Refresh rate in seconds</string>
+    <string name="pref_refresh_rate_title">Screen refresh rate</string>
+    <string name="pref_refresh_rate_summary">Screen Refresh rate in seconds</string>
     <string name="pref_notifications_title">Enable notifications</string>
     <string name="pref_notifications_summary">Enable background notifications</string>
+    <string name="pref_notifications_refresh_rate_title">Notificationservice Refresh rate</string>
+    <string name="pref_notifications_refresh_rate_summary">Notificationservice Refresh rate in seconds</string>
     <string name="unavailable">unavailable</string>
 
 </resources>

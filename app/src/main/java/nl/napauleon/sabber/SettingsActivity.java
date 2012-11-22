@@ -23,8 +23,17 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             } else {
                 stopService(intent);
             }
+        } else if (Constants.NOTIFICATIONS_REFRESHRATE_PREF.equals(key) 
+        		&& isNotificationsEnabled(sharedPreferences)) {
+        	Intent intent = new Intent(this, NotificationService.class);
+        	stopService(intent);
+        	startService(intent);
         }
     }
+
+	private boolean isNotificationsEnabled(SharedPreferences sharedPreferences) {
+		return sharedPreferences.getBoolean(Constants.NOTIFICATIONS_PREF, false);
+	}
 
     @Override
     protected void onResume() {

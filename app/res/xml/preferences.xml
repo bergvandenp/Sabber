@@ -19,23 +19,33 @@
         android:inputType="text"
         android:key="apikeyPref"
         android:title="@string/apikey" />
-    <EditTextPreference
-        android:name="Refresh rate Preference"
-        android:inputType="number"
-        android:key="refreshratePref"
-        android:summary="@string/pref_refresh_rate_summary"
-        android:title="@string/pref_refresh_rate_title" />
-    <EditTextPreference
-        android:name="Minimal size Preference"
-        android:inputType="number"
-        android:key="minsizePref"
-        android:summary="@string/pref_min_size_summary"
-        android:title="@string/pref_min_size_title" />
 
     <CheckBoxPreference
         android:name="Notifications Preference"
         android:key="notificationsPref"
-        android:summary="@string/pref_notifications_summary"
         android:title="@string/pref_notifications_title" />
+
+        <PreferenceScreen android:title="@string/advanced_pref" >
+            <EditTextPreference
+                android:name="Minimal size Preference"
+                android:inputType="number"
+                android:key="minsizePref"
+                android:summary="@string/pref_min_size_summary"
+                android:title="@string/pref_min_size_title" />
+            <EditTextPreference
+                android:name="Screen refresh rate Preference"
+                android:inputType="number"
+                android:key="screenRefreshratePref"
+                android:summary="@string/pref_refresh_rate_summary"
+                android:defaultValue="10"
+                android:title="@string/pref_refresh_rate_title" />
+            <EditTextPreference
+                android:name="Notifications refresh rate Preference"
+                android:inputType="number"
+                android:key="notificationsRefreshratePref"
+                android:summary="@string/pref_notifications_refresh_rate_summary"
+                android:defaultValue="60"
+                android:title="@string/pref_notifications_refresh_rate_title" />
+        </PreferenceScreen>
 
 </PreferenceScreen>

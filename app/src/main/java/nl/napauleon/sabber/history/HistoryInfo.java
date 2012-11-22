@@ -17,7 +17,7 @@ public class HistoryInfo {
 
     public HistoryInfo(String item, Long dateDownloaded, Status status, String message) {
 		this.item = item;
-		this.dateDownloaded = new Date(dateDownloaded*1000L);
+		this.dateDownloaded = new Date(dateDownloaded);
         this.message = message;
         this.status = status;
 	}

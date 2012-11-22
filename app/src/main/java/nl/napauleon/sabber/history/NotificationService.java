@@ -20,6 +20,8 @@ import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetTask;
+
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 
 import java.util.Date;
@@ -29,7 +31,7 @@ import java.util.TimerTask;
 
 public class NotificationService extends Service {
 
-	public static final int POLLING_INTERVAL = 5 * 1000;
+	public static final long DEFAULT_POLLING_INTERVAL = 60 * 1000;
 	public static final String TAG = "NotificationService";
 
 	private PendingIntent notificationIntent;
@@ -53,19 +55,31 @@ public class NotificationService extends Service {
 		final Handler handler = new Handler();
 		final Runnable pollingThread = new Runnable() {
 			public void run() {
-				if (isNetworkConnected()) {
-					new HttpGetTask(new HistoryCallback()).execute(createHistoryConnectionString());
+				String connectionString = createHistoryConnectionString();
+				if (isNetworkConnected() && StringUtils.isNotBlank(connectionString)) {
+					new HttpGetTask(new HistoryCallback()).execute(connectionString);
 				}
 			}
 		};
 
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				Log.d(TAG, "Polling event occurred");
+				Log.d(TAG, String.format("Polling event occurred at time: %tT", new Date()));
 				handler.post(pollingThread);
 			}
-		}, 0, POLLING_INTERVAL);
+		}, 0, getPollingInterval());
 		return START_STICKY;
+	}
+
+	private long getPollingInterval() {
+		String userPollingInterval = PreferenceManager.getDefaultSharedPreferences(this).getString(
+				Constants.NOTIFICATIONS_REFRESHRATE_PREF, Long.toString(DEFAULT_POLLING_INTERVAL / 1000));
+		try {
+			return Long.parseLong(userPollingInterval) * 1000;
+		} catch (NumberFormatException e) {
+			Log.w(TAG, String.format("user entered invalid interval value: %s. Falling back to default.", userPollingInterval));
+			return DEFAULT_POLLING_INTERVAL;
+		}
 	}
 
 	boolean isNetworkConnected() {
@@ -94,11 +108,19 @@ public class NotificationService extends Service {
 	String createHistoryConnectionString() {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(NotificationService.this);
-		return String.format(
-				"http://%s:%s/api?mode=history&limit=5&output=json&apikey=%s",
-				preferences.getString(Constants.HOSTNAME_PREF, ""),
-				preferences.getString(Constants.PORT_PREF, ""),
-				preferences.getString(Constants.APIKEY_PREF, ""));
+		String hostname = preferences.getString(Constants.HOSTNAME_PREF, "");
+		String port = preferences.getString(Constants.PORT_PREF, "");
+		String apikey = preferences.getString(Constants.APIKEY_PREF, "");
+		if (StringUtils.isNotBlank(hostname) && StringUtils.isNotBlank(port)) {
+			return String.format(
+					"http://%s:%s/api?mode=history&limit=5&output=json&apikey=%s",
+					hostname,
+					port,
+					apikey);
+		} else {
+			return null;
+		}
+		
 	}
 
 	boolean shouldNotify(HistoryInfo historyItem) {
@@ -108,9 +130,7 @@ public class NotificationService extends Service {
 		boolean shouldNotify = historyItem.isProcessingComplete()
 				&& lastPollingEvent.before(itemDateDownloaded);
 		if (shouldNotify) {
-			Log.d(TAG,
-					String.format(
-							"ShouldNotify about %s. last polling event: %tT. item downloaded at: %tT",
+			Log.d(TAG, String.format( "ShouldNotify about %s. last polling event: %tT. item downloaded at: %tT",
 							historyItem.getItem(), lastPollingEvent, itemDateDownloaded));
 		}
 		return shouldNotify;
@@ -134,14 +154,15 @@ public class NotificationService extends Service {
 		notificationManager.notify(notificationId, builder.build());
 	}
 
-	private String getNotificationContent(HistoryInfo historyItem) {
-		return historyItem.getItem() + (historyItem.getStatus() == Status.Failed 
-				? " download failed." : " download complete.");
+	String getNotificationContent(HistoryInfo historyItem) {
+		return historyItem.getStatus() == Status.Failed
+                ? getString(R.string.notification_content_failed, historyItem.getItem())
+                : getString(R.string.notification_content_completed, historyItem.getItem());
 	}
 
-	private String getNotificationTitle(HistoryInfo historyItem) {
-		return historyItem.getStatus() == Status.Failed ? "Nzb download failed"
-				: "Nzb download complete";
+	String getNotificationTitle(HistoryInfo historyItem) {
+		return historyItem.getStatus() == Status.Failed ? getString(R.string.notification_title_failed)
+				: getString(R.string.notification_title_completed);
 	}
 
 	private class HistoryCallback extends DefaultErrorCallback {
