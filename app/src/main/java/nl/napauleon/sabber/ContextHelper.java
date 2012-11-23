@@ -35,12 +35,11 @@ public class ContextHelper {
         return prefs.getBoolean(Constants.NOTIFICATIONS_PREF, false);
     }
 
-    public long updateLastPollingEvent(Context context) {
-        long last_polling_event = System.currentTimeMillis();
+    public long updateLastPollingEvent(Context context, long time) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putLong(Constants.LAST_POLLING_EVENT_PREF, last_polling_event);
+        editor.putLong(Constants.LAST_POLLING_EVENT_PREF, time);
         editor.commit();
-        return last_polling_event;
+        return time;
     }
 
     public void handleJsonException(Context context, String originalJsonString, JSONException exception) {

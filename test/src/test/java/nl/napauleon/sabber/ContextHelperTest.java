@@ -31,7 +31,7 @@ public class ContextHelperTest {
     @Test
     public void testUpdateLastPollingEvent() {
         long beforeTime = System.currentTimeMillis();
-        helper.updateLastPollingEvent(context);
+        helper.updateLastPollingEvent(context, System.currentTimeMillis());
         Long lastPollingPref = ShadowPreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.LAST_POLLING_EVENT_PREF, 0L);
         long afterTime = System.currentTimeMillis();
         assertTrue(lastPollingPref >= beforeTime);

@@ -1,8 +1,13 @@
 package nl.napauleon.sabber.history;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import com.actionbarsherlock.BuildConfig;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
@@ -10,18 +15,10 @@ import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetMockTask;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
-
 import org.json.JSONException;
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.actionbarsherlock.BuildConfig;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.SherlockListFragment;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HistoryFragment extends SherlockListFragment{
 
@@ -75,7 +72,7 @@ public class HistoryFragment extends SherlockListFragment{
             ContextHelper contextHelper = new ContextHelper();
             try {
                 historyItems = HistoryInfo.createHistoryList(response);
-                contextHelper.updateLastPollingEvent(getActivity());
+                contextHelper.updateLastPollingEvent(getActivity(), System.currentTimeMillis());
                 setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
             } catch (JSONException e) {
                 contextHelper.handleJsonException(getActivity(), response, e);
