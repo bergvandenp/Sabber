@@ -13,3 +13,4 @@ app/gen/
 app/.pom.xml.swp
 app/gen-external-apklibs/*
 target/
+app/previews.xml
