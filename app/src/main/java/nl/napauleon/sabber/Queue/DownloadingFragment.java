@@ -7,7 +7,9 @@ import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.history.HistoryFragment.HistoryFragmentCallback;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetMockTask;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import nl.napauleon.sabber.http.SabnzbResultHelper;
@@ -26,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.actionbarsherlock.BuildConfig;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 
@@ -104,8 +107,12 @@ public class DownloadingFragment extends SherlockListFragment {
             if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
                 httpGetTask.cancel(true);
             }
-            httpGetTask = new HttpGetTask(new DownloadingCallback());
-            httpGetTask.execute(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
+        	httpGetTask = new HttpGetTask(new DownloadingCallback());
+            if (new ContextHelper().isMockEnabled(getActivity())) {
+	    		new HttpGetMockTask(new DownloadingCallback()).execute("queue/queueresult");
+	    	} else {
+	            httpGetTask.execute(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
+	    	}
         }
     }
 

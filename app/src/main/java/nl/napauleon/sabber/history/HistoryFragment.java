@@ -38,15 +38,19 @@ public class HistoryFragment extends SherlockListFragment{
 
     public void retrieveData() {
     	SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
-    	if (preferences != null) {
-	    	if (BuildConfig.DEBUG && preferences.getString(Constants.PORT_PREF, "").equals("666")) {
-	    		new HttpGetMockTask(new HistoryFragmentCallback()).execute("history/historyresult");
-	    		return;
-	    	}
-	        getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
-	        new HttpGetTask(new HistoryFragmentCallback()).execute(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
-        }
+    	getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
+    	executeRequest(preferences);
     }
+
+	private void executeRequest(SharedPreferences preferences) {
+		if (preferences != null) {
+	    	if (new ContextHelper().isMockEnabled(getActivity())) {
+	    		new HttpGetMockTask(new HistoryFragmentCallback()).execute("history/historyresult");
+	    	} else {
+	    		new HttpGetTask(new HistoryFragmentCallback()).execute(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
+	    	}
+        }
+	}
 
     public class HistoryFragmentCallback extends DefaultErrorCallback {
         public HistoryFragmentCallback() {

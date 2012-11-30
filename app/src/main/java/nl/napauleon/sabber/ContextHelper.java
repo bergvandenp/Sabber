@@ -8,6 +8,8 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.actionbarsherlock.BuildConfig;
+
 public class ContextHelper {
 
     public SharedPreferences checkAndGetSettings(Context context) {
@@ -34,6 +36,10 @@ public class ContextHelper {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(Constants.NOTIFICATIONS_PREF, false);
     }
+
+	public boolean isMockEnabled(Context context) {
+		return BuildConfig.DEBUG && PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.PORT_PREF, "").equals("666");
+	}
 
     public long updateLastPollingEvent(Context context, long time) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();

@@ -1,5 +1,22 @@
 package nl.napauleon.sabber.history;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import nl.napauleon.sabber.Constants;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetMockTask;
+import nl.napauleon.sabber.http.HttpGetTask;
+
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -14,19 +31,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import com.actionbarsherlock.BuildConfig;
-import nl.napauleon.sabber.Constants;
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.MainActivity;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetMockTask;
-import nl.napauleon.sabber.http.HttpGetTask;
-
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-
-import java.util.*;
 
 public class NotificationService extends Service {
 
@@ -39,41 +43,60 @@ public class NotificationService extends Service {
 	boolean notificationsEnabled = false;
 	private Timer timer;
 
+	final Handler handler = new Handler();
+	final Runnable pollingThread = new Runnable() {
+		public void run() {
+            if (new ContextHelper().isMockEnabled(NotificationService.this)) {
+                new HttpGetMockTask(new HistoryCallback()).execute("history/historyresult");
+                return;
+            }
+			String connectionString = createHistoryConnectionString();
+			if (isNetworkConnected() && StringUtils.isNotBlank(connectionString)) {
+				new HttpGetTask(new HistoryCallback()).execute(connectionString);
+			}
+		}
+	};
+
 	@Override
 	public void onCreate() {
 		notificationIntent = PendingIntent.getActivity(
 				NotificationService.this, 0, new Intent(getBaseContext(),
 						MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-	}
-
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "Notification Service starting");
-        Calendar initialTime = Calendar.getInstance();
-        initialTime.add(Calendar.YEAR, -1);
-        new ContextHelper().updateLastPollingEvent(NotificationService.this, initialTime.getTimeInMillis());
-		timer = new Timer();
-		final Handler handler = new Handler();
-		final Runnable pollingThread = new Runnable() {
-			public void run() {
-                if (BuildConfig.DEBUG && PreferenceManager.getDefaultSharedPreferences(NotificationService.this).getString(Constants.PORT_PREF, "").equals("666")) {
-                    new HttpGetMockTask(new HistoryCallback()).execute("history/historyresult");
-                    return;
-                }
-				String connectionString = createHistoryConnectionString();
-				if (isNetworkConnected() && StringUtils.isNotBlank(connectionString)) {
-					new HttpGetTask(new HistoryCallback()).execute(connectionString);
-				}
-			}
-		};
-
+		Calendar initialTime = Calendar.getInstance();
+		ContextHelper contextHelper = new ContextHelper();
+		if (contextHelper.isMockEnabled(this)) {
+			initialTime.add(Calendar.YEAR, -1);
+		}
+		contextHelper.updateLastPollingEvent(NotificationService.this, initialTime.getTimeInMillis());
+        timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				Log.d(TAG, String.format("Polling event occurred at time: %tT", new Date()));
 				handler.post(pollingThread);
 			}
 		}, 0, getPollingInterval());
+	}
+	
+	
+	
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
 		return START_STICKY;
+	}
+
+
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		// no binding supported.
+		return null;
+	}
+
+	@Override
+	public void onDestroy() {
+		timer.cancel();
+		Log.d(TAG, "Notification Service stopped");
 	}
 
 	private long getPollingInterval() {
@@ -96,18 +119,6 @@ public class NotificationService extends Service {
 	private long getLastPollingEvent() {
 		return PreferenceManager.getDefaultSharedPreferences(this).getLong(
 				Constants.LAST_POLLING_EVENT_PREF, 0L);
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		// no binding supported.
-		return null;
-	}
-
-	@Override
-	public void onDestroy() {
-		timer.cancel();
-		Log.d(TAG, "Notification Service stopped");
 	}
 
 	String createHistoryConnectionString() {
