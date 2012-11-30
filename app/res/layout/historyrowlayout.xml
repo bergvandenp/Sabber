@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
     <LinearLayout
-            android:id="@+id/namedaterow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        android:id="@+id/namedaterow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
         <TextView
-                android:id="@+id/itemname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/unavailable"
-                >
+            android:id="@+id/itemname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="200dp"
+            android:padding="10dp"
+            android:text="@string/unavailable" >
         </TextView>
 
         <TextView
-                android:id="@+id/itemdate"
-                android:gravity="right"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/unavailable"
-                style="@style/CodeFont">
+            android:id="@+id/itemdate"
+            style="@style/CodeFont"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:padding="10dp"
+            android:text="@string/unavailable" >
         </TextView>
     </LinearLayout>
-    <TextView android:id="@+id/historymessage"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:padding="10dp"
-              android:textColor="@color/red"
-              android:textStyle="bold"
-              android:layout_below="@id/namedaterow"
-              android:text="@string/unavailable"
-              style="@style/CodeFont"/>
-</RelativeLayout>
 
+    <TextView
+        android:id="@+id/historymessage"
+        style="@style/CodeFont"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/namedaterow"
+        android:padding="10dp"
+        android:text="@string/unavailable"
+        android:textColor="@color/red"
+        android:textStyle="bold" />
+
+</RelativeLayout>

@@ -15,7 +15,8 @@
 
         <TextView
                 android:id="@+id/timeleft"
-                style="@style/CodeFont_global"/>
+                style="@style/CodeFont_global"
+                android:text="@string/unavailable"/>
         <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
@@ -27,7 +28,8 @@
 
         <TextView
                 android:id="@+id/speed"
-                style="@style/CodeFont_global"/>
+                style="@style/CodeFont_global"
+                android:text="@string/unavailable"/>
         <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
@@ -39,7 +41,8 @@
 
         <TextView
                 android:id="@+id/size"
-                style="@style/CodeFont_global"/>
+                style="@style/CodeFont_global"
+                android:text="@string/unavailable"/>
         <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
@@ -51,6 +54,7 @@
 
         <TextView
                 android:id="@+id/eta"
-                style="@style/CodeFont_global"/>
+                style="@style/CodeFont_global"
+                android:text="@string/unavailable"/>
     </LinearLayout>
 </merge>
