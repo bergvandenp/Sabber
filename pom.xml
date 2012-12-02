@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>nl.napauleon.sabber</groupId>
     <artifactId>sabber-parent</artifactId>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.1.4</version>
     <packaging>pom</packaging>
     <name>Sabber parent</name>
     <properties>
@@ -16,7 +16,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sabber</artifactId>
-                <version>1.1.4-SNAPSHOT</version>
+                <version>1.1.4</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
