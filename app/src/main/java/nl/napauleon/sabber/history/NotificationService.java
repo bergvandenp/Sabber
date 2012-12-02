@@ -144,7 +144,8 @@ public class NotificationService extends Service {
 		Date itemDateDownloaded = historyItem.getDateDownloaded();
 		Date lastPollingEvent = new Date(getLastPollingEvent());
 		boolean shouldNotify = historyItem.isProcessingComplete()
-				&& lastPollingEvent.before(itemDateDownloaded);
+				&& lastPollingEvent.before(itemDateDownloaded)
+                && new Date().after(itemDateDownloaded);
 		if (shouldNotify) {
 			Log.d(TAG, String.format( "ShouldNotify about %s. last polling event: %tT. item downloaded at: %tT",
 							historyItem.getItem(), lastPollingEvent, itemDateDownloaded));
