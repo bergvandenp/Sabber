@@ -77,12 +77,12 @@ public class DownloadingFragment extends SherlockListFragment {
         contextHelper = new ContextHelper(getActivity());
         backgroundHandler.removeCallbacks(backgroundUpdater);
         backgroundHandler = new Handler();
+        retrieveQueueData();
+        
         String refreshratePref = PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(Constants.SCREEN_REFRESHRATE_PREF, "0");
         if (StringUtils.isNotBlank(refreshratePref) && Integer.parseInt(refreshratePref) > 0) {
                 refreshrate = Integer.parseInt(refreshratePref) * 1000;
         		backgroundHandler.postDelayed(backgroundUpdater, refreshrate);
-        } else {
-            retrieveQueueData();
         }
     }
 

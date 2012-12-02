@@ -1,5 +1,6 @@
 package nl.napauleon.sabber.history;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,12 +40,14 @@ public class HistoryInfo {
         } catch (IllegalArgumentException e) {
             status = Status.Unknown;
         }
+        
+        String failMessage = slot.getString("fail_message");
 
         return new HistoryInfo(
                 slot.getString("nzb_name").replace(".nzb", ""),
                 slot.getLong("completed") * 1000L,
                 status,
-                status == Status.Failed ? slot.getString("fail_message") : slot.getString("action_line"));
+                StringUtils.isNotBlank(failMessage) ? failMessage : slot.getString("action_line"));
     }
     
     public boolean isProcessingComplete() {
