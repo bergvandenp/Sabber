@@ -1,21 +1,5 @@
 package nl.napauleon.sabber.search;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.SettingsActivity;
-import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.NzbIndexConnectionHelper;
-import nl.napauleon.sabber.http.SabNzbConnectionHelper;
-
-import org.xml.sax.SAXException;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
@@ -33,6 +17,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.SettingsActivity;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.NzbIndexConnectionHelper;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchableActivity extends ListActivity {
     private static final String TAG = "SearchableActivity";
@@ -148,7 +145,7 @@ public class SearchableActivity extends ListActivity {
 
         private void handleParseException(Exception e) {
             Log.e(TAG, "error parsing results", e);
-            new ContextHelper().showErrorAlert(SearchableActivity.this, e.getMessage());
+            new ContextHelper(SearchableActivity.this).showErrorAlert(e.getMessage());
         }
     }
 
@@ -168,7 +165,7 @@ public class SearchableActivity extends ListActivity {
                     .setPositiveButton(context.getString(R.string.option_positive),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    SharedPreferences preferences = new ContextHelper().checkAndGetSettings(context);
+                                    SharedPreferences preferences = new ContextHelper(context).checkAndGetSettings();
                                     if (preferences != null) {
                                         String connectionString = new SabNzbConnectionHelper(preferences).createAddUrlConnectionString(results.get(position));
                                         new HttpGetTask(new SearchClickCallback()).execute(connectionString);

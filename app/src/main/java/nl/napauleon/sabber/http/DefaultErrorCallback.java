@@ -5,12 +5,11 @@ import android.content.Context;
 
 public abstract class DefaultErrorCallback implements HttpCallback{
 
-
 	public void handleError(Context context, String error) {
-		new ContextHelper().showErrorAlert(context, error);
+		new ContextHelper(context).showErrorAlert(error);
 	}
 
 	public void handleTimeout(Context context) {
-		new ContextHelper().showConnectionTimeoutAlert(context);
+		new ContextHelper(context).showConnectionTimeoutAlert();
 	}
 }

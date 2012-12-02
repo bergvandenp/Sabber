@@ -1,14 +1,5 @@
 package nl.napauleon.sabber.queue;
 
-import java.util.Arrays;
-import java.util.List;
-
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.MainActivity;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +8,15 @@ import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class QueueClickListener implements AdapterView.OnItemClickListener{
 
@@ -30,7 +30,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
         queueClickCallback = new QueueClickCallback();
         final QueueInfo queueInfo = queueItems.get((int) l);
         context = adapterView.getContext();
-        final SharedPreferences preferences = new ContextHelper().checkAndGetSettings(context);
+        final SharedPreferences preferences = new ContextHelper(context).checkAndGetSettings();
 
         if (preferences != null) {
 

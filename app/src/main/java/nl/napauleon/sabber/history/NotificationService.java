@@ -1,22 +1,5 @@
 package nl.napauleon.sabber.history;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import nl.napauleon.sabber.Constants;
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.MainActivity;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetMockTask;
-import nl.napauleon.sabber.http.HttpGetTask;
-
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -31,6 +14,17 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import nl.napauleon.sabber.Constants;
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetMockTask;
+import nl.napauleon.sabber.http.HttpGetTask;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+
+import java.util.*;
 
 public class NotificationService extends Service {
 
@@ -40,13 +34,13 @@ public class NotificationService extends Service {
 	private PendingIntent notificationIntent;
 	private final int notificationId = 100;
 
-	boolean notificationsEnabled = false;
 	private Timer timer;
 
 	final Handler handler = new Handler();
-	final Runnable pollingThread = new Runnable() {
+    private ContextHelper contextHelper;
+    final Runnable pollingThread = new Runnable() {
 		public void run() {
-            if (new ContextHelper().isMockEnabled(NotificationService.this)) {
+            if (contextHelper.isMockEnabled()) {
                 new HttpGetMockTask(new HistoryCallback()).execute("history/historyresult");
                 return;
             }
@@ -57,18 +51,14 @@ public class NotificationService extends Service {
 		}
 	};
 
-	@Override
+    @Override
 	public void onCreate() {
+        contextHelper = new ContextHelper(NotificationService.this);
 		notificationIntent = PendingIntent.getActivity(
 				NotificationService.this, 0, new Intent(getBaseContext(),
 						MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 		Log.d(TAG, "Notification Service starting");
-		Calendar initialTime = Calendar.getInstance();
-		ContextHelper contextHelper = new ContextHelper();
-		if (contextHelper.isMockEnabled(this)) {
-			initialTime.add(Calendar.YEAR, -1);
-		}
-		contextHelper.updateLastPollingEvent(NotificationService.this, initialTime.getTimeInMillis());
+        updateLastPollingEvent();
         timer = new Timer();
 		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
@@ -77,10 +67,17 @@ public class NotificationService extends Service {
 			}
 		}, 0, getPollingInterval());
 	}
-	
-	
-	
-	@Override
+
+    private void updateLastPollingEvent() {
+        Calendar initialTime = Calendar.getInstance();
+        if (contextHelper.isMockEnabled()) {
+            initialTime.add(Calendar.YEAR, -1);
+        }
+        contextHelper.updateLastPollingEvent(initialTime.getTimeInMillis());
+    }
+
+
+    @Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		return START_STICKY;
 	}
@@ -198,8 +195,7 @@ public class NotificationService extends Service {
 				for (HistoryInfo historyItem : historyItems) {
 					if (shouldNotify(historyItem)) {
 						sendNotification(historyItem);
-						new ContextHelper()
-								.updateLastPollingEvent(NotificationService.this, System.currentTimeMillis());
+						contextHelper.updateLastPollingEvent(System.currentTimeMillis());
 					}
 				}
 			} catch (JSONException e) {

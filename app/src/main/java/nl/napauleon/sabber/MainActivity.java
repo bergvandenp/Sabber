@@ -35,12 +35,12 @@ public class MainActivity extends SherlockFragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		setSupportProgressBarIndeterminateVisibility(false);
-		ContextHelper contextHelper = new ContextHelper();
-		if (!contextHelper.isSabnzbSettingsPresent(this)) {
+		ContextHelper contextHelper = new ContextHelper(this);
+		if (!contextHelper.isSabnzbSettingsPresent()) {
 			Intent settingsActivity = new Intent(this, SettingsActivity.class);
 			startActivity(settingsActivity);
 		}
-		if (contextHelper.isNotificationsEnabled(this)) {
+		if (contextHelper.isNotificationsEnabled()) {
 			Intent intent = new Intent(this, NotificationService.class);
 			startService(intent);
 		}
@@ -139,8 +139,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	}
 
 	private void togglePauseSabnzb() {
-		SharedPreferences preferences = new ContextHelper()
-				.checkAndGetSettings(this);
+		SharedPreferences preferences = new ContextHelper(this).checkAndGetSettings();
 		if (preferences != null) {
 			String message;
 			SabNzbConnectionHelper connectionHelper = new SabNzbConnectionHelper(

@@ -12,17 +12,24 @@ import com.actionbarsherlock.BuildConfig;
 
 public class ContextHelper {
 
-    public SharedPreferences checkAndGetSettings(Context context) {
-        if (!isSabnzbSettingsPresent(context)) {
-            showConnectionErrorAlert(context);
+    private final SharedPreferences prefs;
+    private final Context context;
+
+    public ContextHelper(Context context) {
+        this.context = context;
+        this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    public SharedPreferences checkAndGetSettings() {
+        if (!isSabnzbSettingsPresent()) {
+            showConnectionErrorAlert();
             return null;
         } else {
             return PreferenceManager.getDefaultSharedPreferences(context);
         }
     }
 
-    public boolean isSabnzbSettingsPresent(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public boolean isSabnzbSettingsPresent() {
         String hostname = prefs.getString(Constants.HOSTNAME_PREF, "");
         String port = prefs.getString(Constants.PORT_PREF, "");
         String apikey = prefs.getString(Constants.APIKEY_PREF, "");
@@ -32,39 +39,38 @@ public class ContextHelper {
                 && apikey != null && !apikey.equals("");
     }
 
-    public boolean isNotificationsEnabled(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public boolean isNotificationsEnabled() {
         return prefs.getBoolean(Constants.NOTIFICATIONS_PREF, false);
     }
 
-	public boolean isMockEnabled(Context context) {
-		return BuildConfig.DEBUG && PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.PORT_PREF, "").equals("666");
+	public boolean isMockEnabled() {
+		return BuildConfig.DEBUG && prefs.getString(Constants.PORT_PREF, "").equals("666");
 	}
 
-    public long updateLastPollingEvent(Context context, long time) {
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+    public long updateLastPollingEvent(long time) {
+        SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(Constants.LAST_POLLING_EVENT_PREF, time);
         editor.commit();
         return time;
     }
 
-    public void handleJsonException(Context context, String originalJsonString, JSONException exception) {
+    public void handleJsonException(String originalJsonString, JSONException exception) {
         try {
-            showErrorAlert(context, new JSONObject(originalJsonString).getString("error"));
+            showErrorAlert(new JSONObject(originalJsonString).getString("error"));
         } catch (JSONException e1) {
             Log.e(Constants.TAG, "Error parsing json string", exception);
         }
     }
 
-    public void showConnectionErrorAlert(Context context) {
-        showErrorAlert(context, Constants.MESSAGE_SETTINGS_NOT_VALID);
+    public void showConnectionErrorAlert() {
+        showErrorAlert(Constants.MESSAGE_SETTINGS_NOT_VALID);
     }
 
-    public void showErrorAlert(Context context, String message) {
+    public void showErrorAlert(String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
-    public void showConnectionTimeoutAlert(Context context) {
-        showErrorAlert(context, Constants.MESSAGE_CONNECTION_TIMEOUT);
+    public void showConnectionTimeoutAlert() {
+        showErrorAlert(Constants.MESSAGE_CONNECTION_TIMEOUT);
     }
 }

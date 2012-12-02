@@ -5,10 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.actionbarsherlock.BuildConfig;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
-import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
@@ -23,6 +21,7 @@ import java.util.List;
 public class HistoryFragment extends SherlockListFragment{
 
     private List<HistoryInfo> historyItems;
+    private ContextHelper contextHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,18 +32,19 @@ public class HistoryFragment extends SherlockListFragment{
     @Override
     public void onResume() {
         super.onResume();
+        contextHelper = new ContextHelper(getActivity());
         retrieveData();
     }
 
     public void retrieveData() {
-    	SharedPreferences preferences = new ContextHelper().checkAndGetSettings(getActivity());
+    	SharedPreferences preferences = contextHelper.checkAndGetSettings();
     	getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
     	executeRequest(preferences);
     }
 
 	private void executeRequest(SharedPreferences preferences) {
 		if (preferences != null) {
-	    	if (new ContextHelper().isMockEnabled(getActivity())) {
+            if (contextHelper.isMockEnabled()) {
 	    		new HttpGetMockTask(new HistoryFragmentCallback()).execute("history/historyresult");
 	    	} else {
 	    		new HttpGetTask(new HistoryFragmentCallback()).execute(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
@@ -73,13 +73,12 @@ public class HistoryFragment extends SherlockListFragment{
 		}
 
         private void handleResult(String response) {
-            ContextHelper contextHelper = new ContextHelper();
             try {
                 historyItems = HistoryInfo.createHistoryList(response);
-                contextHelper.updateLastPollingEvent(getActivity(), System.currentTimeMillis());
+                contextHelper.updateLastPollingEvent(System.currentTimeMillis());
                 setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
             } catch (JSONException e) {
-                contextHelper.handleJsonException(getActivity(), response, e);
+                contextHelper.handleJsonException(response, e);
             }
         }
     }
