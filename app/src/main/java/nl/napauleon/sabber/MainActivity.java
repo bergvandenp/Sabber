@@ -149,7 +149,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			} else {
 				message = connectionHelper.createPauseConnection();
 			}
-			new HttpGetTask(new MainCallback()).execute(message);
+			new HttpGetTask(new MainCallback()).executeRequest(message);
 		}
 	}
 

@@ -107,9 +107,9 @@ public class DownloadingFragment extends SherlockListFragment {
             }
         	httpGetTask = new HttpGetTask(new DownloadingCallback());
             if (contextHelper.isMockEnabled()) {
-	    		new HttpGetMockTask(new DownloadingCallback()).execute("queue/queueresult");
+	    		new HttpGetMockTask(new DownloadingCallback()).executeRequest("queue/queueresult");
 	    	} else {
-	            httpGetTask.execute(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
+	            httpGetTask.executeRequest(new SabNzbConnectionHelper(preferences).createQueueConnectionString());
 	    	}
         }
     }

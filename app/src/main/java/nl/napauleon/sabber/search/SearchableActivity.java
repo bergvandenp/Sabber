@@ -94,7 +94,7 @@ public class SearchableActivity extends ListActivity {
             httpGetTask.cancel(true);
         }
         httpGetTask = new HttpGetTask(new SearchCallback());
-        httpGetTask.execute(searchString);
+        httpGetTask.executeRequest(searchString);
     }
 
     public class SearchCallback extends DefaultErrorCallback {
@@ -168,7 +168,7 @@ public class SearchableActivity extends ListActivity {
                                     SharedPreferences preferences = new ContextHelper(context).checkAndGetSettings();
                                     if (preferences != null) {
                                         String connectionString = new SabNzbConnectionHelper(preferences).createAddUrlConnectionString(results.get(position));
-                                        new HttpGetTask(new SearchClickCallback()).execute(connectionString);
+                                        new HttpGetTask(new SearchClickCallback()).executeRequest(connectionString);
                                     }
                                 }
                             })

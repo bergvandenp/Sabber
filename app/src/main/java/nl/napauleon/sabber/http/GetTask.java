@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import nl.napauleon.sabber.Constants;
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 public abstract class GetTask extends AsyncTask<String, Void, String> {
@@ -16,6 +18,15 @@ public abstract class GetTask extends AsyncTask<String, Void, String> {
 
     public GetTask(HttpCallback callback) {
         this.callback = callback;
+    }
+    
+    @SuppressLint("NewApi")
+	public void executeRequest(String... params) {
+    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+    		super.execute(params);
+    	} else {
+    		super.executeOnExecutor(THREAD_POOL_EXECUTOR, params);
+    	}	
     }
 
     private void notifyFrontendAboutError() {

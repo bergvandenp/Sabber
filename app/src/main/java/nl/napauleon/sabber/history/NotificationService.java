@@ -1,5 +1,6 @@
 package nl.napauleon.sabber.history;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -41,12 +42,12 @@ public class NotificationService extends Service {
     final Runnable pollingThread = new Runnable() {
 		public void run() {
             if (contextHelper.isMockEnabled()) {
-                new HttpGetMockTask(new HistoryCallback()).execute("history/historyresult");
+                new HttpGetMockTask(new HistoryCallback()).executeRequest("history/historyresult");
                 return;
             }
 			String connectionString = createHistoryConnectionString();
 			if (isNetworkConnected() && StringUtils.isNotBlank(connectionString)) {
-				new HttpGetTask(new HistoryCallback()).execute(connectionString);
+				new HttpGetTask(new HistoryCallback()).executeRequest(connectionString);
 			}
 		}
 	};
@@ -162,6 +163,7 @@ public class NotificationService extends Service {
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle(getNotificationTitle(historyItem))
 				.setContentText(getNotificationContent(historyItem))
+				.setAutoCancel(true)
 				.setSound(
 						RingtoneManager.getActualDefaultRingtoneUri(this,
 								RingtoneManager.TYPE_NOTIFICATION));

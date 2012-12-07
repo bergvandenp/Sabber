@@ -32,11 +32,11 @@ public class HistoryFragment extends SherlockListFragment{
     @Override
     public void onResume() {
         super.onResume();
-        contextHelper = new ContextHelper(getActivity());
         retrieveData();
     }
 
     public void retrieveData() {
+    	contextHelper = new ContextHelper(getActivity());
     	SharedPreferences preferences = contextHelper.checkAndGetSettings();
     	getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
     	executeRequest(preferences);
@@ -45,9 +45,9 @@ public class HistoryFragment extends SherlockListFragment{
 	private void executeRequest(SharedPreferences preferences) {
 		if (preferences != null) {
             if (contextHelper.isMockEnabled()) {
-	    		new HttpGetMockTask(new HistoryFragmentCallback()).execute("history/historyresult");
+	    		new HttpGetMockTask(new HistoryFragmentCallback()).executeRequest("history/historyresult");
 	    	} else {
-	    		new HttpGetTask(new HistoryFragmentCallback()).execute(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
+	    		new HttpGetTask(new HistoryFragmentCallback()).executeRequest(new SabNzbConnectionHelper(preferences).createHistoryConnectionString());
 	    	}
         }
 	}
