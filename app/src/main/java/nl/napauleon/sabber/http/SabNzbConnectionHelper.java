@@ -1,14 +1,14 @@
 package nl.napauleon.sabber.http;
 
+import android.content.SharedPreferences;
+import android.util.Log;
+import nl.napauleon.sabber.Constants;
+import nl.napauleon.sabber.search.NzbInfo;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import nl.napauleon.sabber.Constants;
-import nl.napauleon.sabber.search.NzbInfo;
-import android.content.SharedPreferences;
-import android.util.Log;
 
 public class SabNzbConnectionHelper {
 
@@ -32,12 +32,17 @@ public class SabNzbConnectionHelper {
             name = matcher.group(1);
         }
         try {
-            return String.format(createBaseConnectionString() + "&mode=addurl&name=%s&nzbname=%s", URLEncoder.encode(link, ENCODING),
+            String format = String.format(createBaseConnectionString() + "&mode=addurl&name=%s&nzbname=%s", URLEncoder.encode(link, ENCODING),
                     URLEncoder.encode(name, ENCODING));
+            return format;
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, "Unsupported encoding: " + ENCODING, e);
         }
         return null;
+    }
+
+    public String createAddUrlConnectionString(NzbInfo nzbInfo, String category) {
+        return createAddUrlConnectionString(nzbInfo) + "&cat=" + category;
     }
 
     public String createHistoryConnectionString() {
