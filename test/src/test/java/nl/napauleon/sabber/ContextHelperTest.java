@@ -18,20 +18,20 @@ public class ContextHelperTest {
 
     @Before
     public void setUp() throws Exception {
-        helper = new ContextHelper();
         context = new MainActivity();
+        helper = new ContextHelper(context);
     }
 
     @Test
     public void testShowConnectionTimeoutAlert() {
-        helper.showConnectionTimeoutAlert(context);
+        helper.showConnectionTimeoutAlert();
         ShadowToast.showedToast(Constants.MESSAGE_CONNECTION_TIMEOUT);
     }
 
     @Test
     public void testUpdateLastPollingEvent() {
         long beforeTime = System.currentTimeMillis();
-        helper.updateLastPollingEvent(context, System.currentTimeMillis());
+        helper.updateLastPollingEvent(System.currentTimeMillis());
         Long lastPollingPref = ShadowPreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.LAST_POLLING_EVENT_PREF, 0L);
         long afterTime = System.currentTimeMillis();
         assertTrue(lastPollingPref >= beforeTime);
@@ -40,7 +40,7 @@ public class ContextHelperTest {
 
     @Test
     public void testIsNotificationsEnabled_NotSet() throws Exception {
-        boolean result = helper.isNotificationsEnabled(context);
+        boolean result = helper.isNotificationsEnabled();
         assertFalse(result);
     }
 
@@ -49,7 +49,7 @@ public class ContextHelperTest {
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean(Constants.NOTIFICATIONS_PREF, false);
         editor.commit();
-        boolean result = helper.isNotificationsEnabled(context);
+        boolean result = helper.isNotificationsEnabled();
         assertFalse(result);
     }
 
@@ -58,19 +58,19 @@ public class ContextHelperTest {
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean(Constants.NOTIFICATIONS_PREF, true);
         editor.commit();
-        boolean result = helper.isNotificationsEnabled(context);
+        boolean result = helper.isNotificationsEnabled();
         assertTrue(result);
     }
 
     @Test
     public void testCheckAndGetSettings_AllEmpty() throws Exception {
-        helper.checkAndGetSettings(context);
+        helper.checkAndGetSettings();
         assertTrue(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
     }
 
     @Test
     public void testCheckAndGetSettings_HostnameEmpty() throws Exception {
-        helper.checkAndGetSettings(context);
+        helper.checkAndGetSettings();
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putString(Constants.APIKEY_PREF, "bla");
         editor.putString(Constants.PORT_PREF, "portbla");
@@ -80,7 +80,7 @@ public class ContextHelperTest {
 
     @Test
     public void testCheckAndGetSettings_PortEmpty() throws Exception {
-        helper.checkAndGetSettings(context);
+        helper.checkAndGetSettings();
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putString(Constants.APIKEY_PREF, "bla");
         editor.putString(Constants.HOSTNAME_PREF, "hostbla");
@@ -90,7 +90,7 @@ public class ContextHelperTest {
 
     @Test
     public void testCheckAndGetSettings_ApiKeyEmpty() throws Exception {
-        helper.checkAndGetSettings(context);
+        helper.checkAndGetSettings();
         SharedPreferences.Editor editor = ShadowPreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putString(Constants.HOSTNAME_PREF, "hostbla");
         editor.putString(Constants.PORT_PREF, "portbla");
@@ -105,7 +105,7 @@ public class ContextHelperTest {
         editor.putString(Constants.HOSTNAME_PREF, "hostbla");
         editor.putString(Constants.PORT_PREF, "portbla");
         editor.commit();
-        helper.checkAndGetSettings(context);
+        helper.checkAndGetSettings();
 
         assertFalse(ShadowToast.showedToast(Constants.MESSAGE_SETTINGS_NOT_VALID));
 

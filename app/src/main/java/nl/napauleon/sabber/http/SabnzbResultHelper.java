@@ -17,6 +17,10 @@ public class SabnzbResultHelper {
     private static final String TAG = "SabnzbResultHelper";
 
     public SabnzbResultHelper(String jsonMessage) {
+        parse(jsonMessage);
+    }
+
+    private void parse(String jsonMessage) {
         try {
             jsonObject = ((JSONObject) new JSONTokener(jsonMessage).nextValue()).getJSONObject("queue");
         } catch (JSONException e) {

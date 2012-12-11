@@ -1,15 +1,15 @@
 package nl.napauleon.sabber.http;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import nl.napauleon.sabber.Constants;
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+import nl.napauleon.sabber.Constants;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public abstract class GetTask extends AsyncTask<String, Void, String> {
 	protected static final String TAG = Constants.TAG + ".HttpGetTask";
@@ -26,7 +26,7 @@ public abstract class GetTask extends AsyncTask<String, Void, String> {
     		super.execute(params);
     	} else {
     		super.executeOnExecutor(THREAD_POOL_EXECUTOR, params);
-    	}	
+    	}
     }
 
     private void notifyFrontendAboutError() {

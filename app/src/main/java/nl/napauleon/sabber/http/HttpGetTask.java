@@ -1,8 +1,6 @@
 package nl.napauleon.sabber.http;
 
-import java.io.IOException;
-import java.io.InputStream;
-
+import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -12,7 +10,8 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import android.util.Log;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class HttpGetTask extends GetTask {
 
@@ -26,7 +25,7 @@ public class HttpGetTask extends GetTask {
         HttpResponse response = null;
         String request = strings[0];
         try {
-            response = executeRequest(request);
+            response = executeHttpRequest(request);
             content = response.getEntity().getContent();
             if (isCancelled()) {
                 return null;
@@ -50,7 +49,7 @@ public class HttpGetTask extends GetTask {
         return null;
     }
 
-    private HttpResponse executeRequest(String string) throws IOException {
+    private HttpResponse executeHttpRequest(String string) throws IOException {
         HttpResponse response;HttpParams httpParameters = new BasicHttpParams();
         // Set the timeout in milliseconds until a connection is established.
         int timeoutConnection = 3000;

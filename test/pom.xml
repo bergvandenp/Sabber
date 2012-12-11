@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <version>1.1.2-SNAPSHOT</version>
+        <version>1.1.5-SNAPSHOT</version>
         <groupId>nl.napauleon.sabber</groupId>
         <artifactId>sabber-parent</artifactId>
     </parent>
@@ -10,7 +10,6 @@
     <artifactId>sabber-test</artifactId>
     <packaging>jar</packaging>
     <name>Sabber Android test</name>
-
 
     <properties>
         <abs.version>4.0.1</abs.version>
