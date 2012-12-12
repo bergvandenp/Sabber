@@ -1,6 +1,5 @@
 package nl.napauleon.sabber.history;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -33,7 +32,7 @@ public class NotificationService extends Service {
 	public static final String TAG = "NotificationService";
 
 	private PendingIntent notificationIntent;
-	private final int notificationId = 100;
+	private int notificationId = 100;
 
 	private Timer timer;
 
@@ -54,6 +53,7 @@ public class NotificationService extends Service {
 
     @Override
 	public void onCreate() {
+        notificationId = 100;
         contextHelper = new ContextHelper(NotificationService.this);
 		notificationIntent = PendingIntent.getActivity(
 				NotificationService.this, 0, new Intent(getBaseContext(),
@@ -165,10 +165,11 @@ public class NotificationService extends Service {
 				.setContentText(getNotificationContent(historyItem))
 				.setAutoCancel(true)
 				.setSound(
-						RingtoneManager.getActualDefaultRingtoneUri(this,
-								RingtoneManager.TYPE_NOTIFICATION));
+                        RingtoneManager.getActualDefaultRingtoneUri(this,
+                                RingtoneManager.TYPE_NOTIFICATION));
 		notificationManager.notify(notificationId, builder.build());
-	}
+        notificationId += 1;
+    }
 
 	String getNotificationContent(HistoryInfo historyItem) {
 		return historyItem.getStatus() == Status.Failed
