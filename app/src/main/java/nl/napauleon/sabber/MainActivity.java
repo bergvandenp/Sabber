@@ -29,7 +29,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	private static final String TAG_DOWNLOADING_TAB = "downloading";
 	private boolean paused = false;
     private Menu optionsMenu;
-    private boolean mMDeferRefreshing;
+    private boolean deferRefreshing;
     private ViewPager pager;
     private DownloadingFragment downloadingFragment;
     private HistoryFragment historyFragment;
@@ -109,12 +109,12 @@ public class MainActivity extends SherlockFragmentActivity {
     public void setRefreshing(boolean refreshing) {
         if (optionsMenu == null) {
             if (refreshing) {
-                mMDeferRefreshing = true;
+                deferRefreshing = true;
             }
             return;
         }
 
-        mMDeferRefreshing = false;
+        deferRefreshing = false;
         final MenuItem refreshItem = optionsMenu.findItem(R.id.menu_refresh);
         if (refreshItem != null) {
             if (refreshing) {
@@ -131,7 +131,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		inflater.inflate(R.menu.main_menu, menu);
         SearchableActivity.setupSearchItem(this, menu);
         optionsMenu = menu;
-        if (mMDeferRefreshing) {
+        if (deferRefreshing) {
             setRefreshing(true);
         }
 		return true;
