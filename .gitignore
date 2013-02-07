@@ -14,3 +14,6 @@ app/.pom.xml.swp
 app/gen-external-apklibs/*
 target/
 app/previews.xml
+photoshop/
+*.ipr
+*.iws

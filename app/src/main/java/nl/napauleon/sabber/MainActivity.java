@@ -1,40 +1,51 @@
 package nl.napauleon.sabber;
 
-import nl.napauleon.sabber.history.HistoryFragment;
-import nl.napauleon.sabber.history.NotificationService;
-import nl.napauleon.sabber.http.DefaultErrorCallback;
-import nl.napauleon.sabber.http.HttpGetTask;
-import nl.napauleon.sabber.http.SabNzbConnectionHelper;
-import nl.napauleon.sabber.queue.DownloadingFragment;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
+
+import nl.napauleon.sabber.history.HistoryFragment;
+import nl.napauleon.sabber.history.NotificationService;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
+import nl.napauleon.sabber.queue.DownloadingFragment;
+import nl.napauleon.sabber.search.SearchableActivity;
+
 public class MainActivity extends SherlockFragmentActivity {
 
 	private static final String TAG_HISTORY_TAB = "history";
 	private static final String TAG_DOWNLOADING_TAB = "downloading";
-	private static final String SELECTED_TAB_PREF = "selectedTab";
-	private TabListener<DownloadingFragment> downloadingListener;
-	private TabListener<HistoryFragment> historyListener;
 	private boolean paused = false;
+    private Menu optionsMenu;
+    private boolean mMDeferRefreshing;
+    private ViewPager pager;
+    private DownloadingFragment downloadingFragment;
+    private HistoryFragment historyFragment;
 
-	public void setPaused(boolean paused) {
+    public void setPaused(boolean paused) {
 		this.paused = paused;
 	}
 
+    public boolean isPaused() {
+        return paused;
+    }
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		requestWindowFeature(com.actionbarsherlock.view.Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		setSupportProgressBarIndeterminateVisibility(false);
 		ContextHelper contextHelper = new ContextHelper(this);
 		if (!contextHelper.isSabnzbSettingsPresent()) {
 			Intent settingsActivity = new Intent(this, SettingsActivity.class);
@@ -44,56 +55,85 @@ public class MainActivity extends SherlockFragmentActivity {
 			Intent intent = new Intent(this, NotificationService.class);
 			startService(intent);
 		}
-	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		initializeTabs();
-	}
+        // set up viewpager
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                getSupportActionBar().setSelectedNavigationItem(position);
+            }
+        });
+        pager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
+            @Override
+            public Fragment getItem(int i) {
+                switch (i) {
+                    case 0: return (downloadingFragment = new DownloadingFragment());
+                    case 1: return (historyFragment = new HistoryFragment());
+                }
+                return null;
+            }
 
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		initializeTabs();
-		ActionBar actionBar = getSupportActionBar();
-		ActionBar.Tab tab = actionBar.getTabAt(savedInstanceState.getInt(
-				SELECTED_TAB_PREF, 0));
-		actionBar.selectTab(tab);
-	}
+            @Override
+            public int getCount() {
+                return 2;
+            }
+        });
+        pager.setPageMarginDrawable(R.drawable.list_divider_holo_light);
+        pager.setPageMargin((int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
 
-	private void initializeTabs() {
-		ActionBar actionBar = getSupportActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		actionBar.setDisplayShowTitleEnabled(false);
-		if (actionBar.getTabCount() == 0) {
-			downloadingListener = new TabListener<DownloadingFragment>(this,
-					"downloading", DownloadingFragment.class);
-			actionBar.addTab(actionBar.newTab().setText(R.string.downloading)
-					.setTabListener(downloadingListener).setTag("downloading"));
+        // set up tabs
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(false);
 
-			historyListener = new TabListener<HistoryFragment>(this, "history",
-					HistoryFragment.class);
-			actionBar.addTab(actionBar.newTab().setText(R.string.history)
-					.setTabListener(historyListener).setTag(TAG_HISTORY_TAB));
-		}
-	}
+        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                pager.setCurrentItem(tab.getPosition());
+            }
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		ActionBar.Tab selectedTab = getSupportActionBar().getSelectedTab();
-		if (selectedTab != null) {
-			outState.putInt(SELECTED_TAB_PREF, selectedTab.getPosition());
-		}
-		getSupportActionBar().removeAllTabs();
-		super.onSaveInstanceState(outState);
-	}
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            }
+
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+            }
+        };
+
+        actionBar.addTab(actionBar.newTab().setText(R.string.downloading)
+                .setTabListener(tabListener).setTag(TAG_DOWNLOADING_TAB));
+        actionBar.addTab(actionBar.newTab().setText(R.string.history)
+                .setTabListener(tabListener).setTag(TAG_HISTORY_TAB));
+    }
+
+    public void setRefreshing(boolean refreshing) {
+        if (optionsMenu == null) {
+            if (refreshing) {
+                mMDeferRefreshing = true;
+            }
+            return;
+        }
+
+        mMDeferRefreshing = false;
+        final MenuItem refreshItem = optionsMenu.findItem(R.id.menu_refresh);
+        if (refreshItem != null) {
+            if (refreshing) {
+                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+            } else {
+                refreshItem.setActionView(null);
+            }
+        }
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
-
+        SearchableActivity.setupSearchItem(this, menu);
+        optionsMenu = menu;
+        if (mMDeferRefreshing) {
+            setRefreshing(true);
+        }
 		return true;
 	}
 
@@ -124,14 +164,14 @@ public class MainActivity extends SherlockFragmentActivity {
 			return true;
 		} else if (item.getItemId() == R.id.menu_refresh) {
 			Object tag = getSupportActionBar().getSelectedTab().getTag();
-			if (tag.equals(TAG_DOWNLOADING_TAB)) {
-				downloadingListener.mFragment.onResume();
-			} else if (tag.equals(TAG_HISTORY_TAB)) {
-				historyListener.mFragment.onResume();
+			if (tag.equals(TAG_DOWNLOADING_TAB) && downloadingFragment != null) {
+				downloadingFragment.onResume();
+			} else if (tag.equals(TAG_HISTORY_TAB) && historyFragment != null) {
+				historyFragment.onResume();
 			}
 			return true;
 		} else if (item.getItemId() == R.id.menu_search) {
-			this.onSearchRequested();
+            SearchableActivity.onSearchClicked(this, item);
 			return true;
 		} else {
 			return super.onOptionsItemSelected(item);
@@ -167,6 +207,5 @@ public class MainActivity extends SherlockFragmentActivity {
 		public void handleError(String error) {
 			super.handleError(MainActivity.this, error);
 		}
-
 	}
 }

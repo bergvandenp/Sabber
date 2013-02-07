@@ -1,6 +1,7 @@
 package nl.napauleon.sabber.history;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
@@ -43,7 +44,9 @@ public class HistoryListAdapter extends ArrayAdapter<HistoryInfo>{
             dateView.setText(historyInfo.getDateDownloadedAsString());
         }
         messageView.setText(historyInfo.getMessage());
-		return rowView;
+        messageView.setVisibility(TextUtils.isEmpty(historyInfo.getMessage())
+                ? View.GONE : View.VISIBLE);
+        return rowView;
 	}
 
 }

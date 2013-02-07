@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,6 @@ import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.*;
 import nl.napauleon.sabber.search.GlobalInfo;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class DownloadingFragment extends SherlockListFragment {
         retrieveQueueData();
         
         String refreshratePref = PreferenceManager.getDefaultSharedPreferences(this.getActivity()).getString(Constants.SCREEN_REFRESHRATE_PREF, "0");
-        if (StringUtils.isNotBlank(refreshratePref) && Integer.parseInt(refreshratePref) > 0) {
+        if (!TextUtils.isEmpty(refreshratePref) && Integer.parseInt(refreshratePref) > 0) {
                 refreshrate = Integer.parseInt(refreshratePref) * 1000;
         		backgroundHandler.postDelayed(backgroundUpdater, refreshrate);
         }
@@ -101,7 +101,7 @@ public class DownloadingFragment extends SherlockListFragment {
     public void retrieveQueueData() {
         SharedPreferences preferences = new ContextHelper(getActivity()).checkAndGetSettings();
         if (preferences != null) {
-            getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
+            ((MainActivity) getSherlockActivity()).setRefreshing(true);
             if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
                 httpGetTask.cancel(true);
             }
@@ -152,18 +152,21 @@ public class DownloadingFragment extends SherlockListFragment {
     }
 
     private void togglePause(boolean paused) {
-        if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).setPaused(paused);
-            if (Build.VERSION.SDK_INT >= 11) {
-                getActivity().invalidateOptionsMenu();
-            }
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity.isPaused() == paused) {
+            return;
+        }
+
+        activity.setPaused(paused);
+        if (Build.VERSION.SDK_INT >= 11) {
+            getActivity().invalidateOptionsMenu();
         }
     }
 
     private void stopSpinner() {
-        SherlockFragmentActivity sherlockActivity = getSherlockActivity();
-        if (sherlockActivity != null) {
-            sherlockActivity.setSupportProgressBarIndeterminateVisibility(false);
+        MainActivity activity = (MainActivity) getSherlockActivity();
+        if (activity != null) {
+            activity.setRefreshing(false);
         }
     }
 

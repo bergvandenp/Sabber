@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.ContextHelper;
@@ -21,7 +22,6 @@ import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetMockTask;
 import nl.napauleon.sabber.http.HttpGetTask;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 
 import java.util.*;
@@ -45,7 +45,7 @@ public class NotificationService extends Service {
                 return;
             }
 			String connectionString = createHistoryConnectionString();
-			if (isNetworkConnected() && StringUtils.isNotBlank(connectionString)) {
+			if (isNetworkConnected() && !TextUtils.isEmpty(connectionString)) {
 				new HttpGetTask(new HistoryCallback()).execute(connectionString);
 			}
 		}
@@ -124,7 +124,7 @@ public class NotificationService extends Service {
 		String hostname = preferences.getString(Constants.HOSTNAME_PREF, "");
 		String port = preferences.getString(Constants.PORT_PREF, "");
 		String apikey = preferences.getString(Constants.APIKEY_PREF, "");
-		if (StringUtils.isNotBlank(hostname) && StringUtils.isNotBlank(port)) {
+		if (!TextUtils.isEmpty(hostname) && !TextUtils.isEmpty(port)) {
 			return String.format(
 					"http://%s:%s/api?mode=history&limit=5&output=json&apikey=%s",
 					hostname,
@@ -153,13 +153,14 @@ public class NotificationService extends Service {
 	private void sendNotification(HistoryInfo historyItem) {
 		Log.i(TAG,
 				"Sending notification for item " + historyItem.getItem()
-						+ " with downloaddate: "
+						+ " with download date: "
 						+ historyItem.getDateDownloadedAsString());
 		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				this)
 				.setContentIntent(notificationIntent)
-				.setSmallIcon(R.drawable.ic_launcher)
+				.setSmallIcon(R.drawable.ic_stat_notify)
+                .setAutoCancel(true)
 				.setContentTitle(getNotificationTitle(historyItem))
 				.setContentText(getNotificationContent(historyItem))
 				.setSound(
