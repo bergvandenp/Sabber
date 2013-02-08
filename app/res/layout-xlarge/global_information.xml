@@ -1,60 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?android:attr/detailsElementBackground"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView
+        android:text="@string/text_time_left"
+        style="@style/CodeFont.Small"
+        android:layout_marginTop="16dp" />
 
-    <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="20dp">
+    <TextView
+        android:id="@+id/timeleft"
+        style="@style/CodeFont"
+        android:text="@string/unavailable" />
 
-        <TextView
-                android:text="@string/text_time_left"
-                style="@style/CodeFont_global_header"
-                android:layout_marginTop="16dp"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#DADADA"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
-        <TextView
-                android:id="@+id/timeleft"
-                style="@style/CodeFont_global"
-                android:text="@string/unavailable"/>
-        <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#DADADA"
-                android:layout_marginTop="20dp"/>
-        <TextView
-                android:text="@string/text_speed"
-                style="@style/CodeFont_global_header"/>
+    <TextView
+        android:text="@string/text_speed"
+        style="@style/CodeFont.Small" />
 
-        <TextView
-                android:id="@+id/speed"
-                style="@style/CodeFont_global"
-                android:text="@string/unavailable"/>
-        <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#DADADA"
-                android:layout_marginTop="20dp"/>
-        <TextView
-                android:text="@string/text_total_size"
-                style="@style/CodeFont_global_header"/>
+    <TextView
+        android:id="@+id/speed"
+        style="@style/CodeFont"
+        android:text="@string/unavailable" />
 
-        <TextView
-                android:id="@+id/size"
-                style="@style/CodeFont_global"
-                android:text="@string/unavailable"/>
-        <View
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#DADADA"
-                android:layout_marginTop="20dp"/>
-        <TextView
-                android:text="@string/text_time_finished"
-                style="@style/CodeFont_global_header"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#DADADA"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
-        <TextView
-                android:id="@+id/eta"
-                style="@style/CodeFont_global"
-                android:text="@string/unavailable"/>
-    </LinearLayout>
-</merge>
+    <TextView
+        android:text="@string/text_total_size"
+        style="@style/CodeFont.Small" />
+
+    <TextView
+        android:id="@+id/size"
+        style="@style/CodeFont"
+        android:text="@string/unavailable" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#DADADA"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:text="@string/text_time_finished"
+        style="@style/CodeFont.Small" />
+
+    <TextView
+        android:id="@+id/eta"
+        style="@style/CodeFont"
+        android:text="@string/unavailable"
+        android:layout_marginBottom="16dp" />
+</LinearLayout>

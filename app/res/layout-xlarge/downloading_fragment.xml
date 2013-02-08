@@ -3,27 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:background="#f1f1f1">
+    android:paddingLeft="@dimen/side_margin"
+    android:paddingRight="@dimen/side_margin">
 
-    <ListView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@android:id/list"
-        android:layout_width="800dp"
+    <include layout="@layout/itemlist"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent" />
 
-    <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:background="#DADADA" />
-
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal" 
-        android:background="@android:color/background_light">
-
-        <include layout="@layout/global_information" />
-    </LinearLayout>
+    <include layout="@layout/global_information"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_width="@dimen/global_info_pane_width"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

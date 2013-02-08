@@ -27,7 +27,7 @@ public class HistoryFragment extends SherlockListFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.itemlist, container, false);
+        return inflater.inflate(R.layout.history_fragment, container, false);
     }
 
     @Override

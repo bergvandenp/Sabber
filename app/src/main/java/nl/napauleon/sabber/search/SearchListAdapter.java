@@ -58,6 +58,10 @@ public class SearchListAdapter extends ArrayAdapter<NzbInfo> {
 
         String escaped = Html.escapeHtml(text);
         for (String keyword : keywords) {
+            if (TextUtils.isEmpty(keyword)) {
+                continue;
+            }
+
             escaped = Pattern
                     .compile("(" + keyword + ")", Pattern.CASE_INSENSITIVE)
                     .matcher(escaped)
