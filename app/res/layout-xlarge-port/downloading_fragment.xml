@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/side_margin"
+    android:paddingRight="@dimen/side_margin">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:background="@android:color/background_light"
-                  android:orientation="horizontal">
-        <include layout="@layout/global_information"/>
-    </LinearLayout>
+    <include layout="@layout/itemlist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-    <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="#DADADA"/>
-
-    <include layout="@layout/itemlist"/>
+    <include layout="@layout/global_information"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

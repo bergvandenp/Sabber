@@ -1,42 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/text_timeleft"
+        style="@style/CodeFont.Small"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_below="@id/text_timeleft"
+        android:text="@string/text_time_left" />
 
-        <TextView
-            android:id="@+id/text_timeleft"
-            style="@style/CodeFont"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/text_timeleft"
-            android:paddingLeft="10dp"
-            android:text="@string/text_time_left" >
-        </TextView>
+    <TextView
+        android:id="@+id/timeleft"
+        style="@style/CodeFont.Small"
+        android:textColor="#000"
+        android:fontFamily="sans-serif"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/text_timeleft"
+        android:paddingLeft="16dp"
+        android:text="@string/unavailable" />
 
-        <TextView
-            android:id="@+id/timeleft"
-            style="@style/CodeFont"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/text_timeleft"
-            android:paddingLeft="10dp"
-            android:text="@string/unavailable" >
-        </TextView>
-
-        <ProgressBar
-            android:id="@+id/progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/timeleft"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" />
-    </RelativeLayout>
-
-</merge>
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timeleft" />
+</RelativeLayout>
