@@ -52,10 +52,10 @@ public class HttpGetTask extends GetTask {
     private HttpResponse executeHttpRequest(String string) throws IOException {
         HttpResponse response;HttpParams httpParameters = new BasicHttpParams();
         // Set the timeout in milliseconds until a connection is established.
-        int timeoutConnection = 3000;
+        int timeoutConnection = 8000;
         HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
         // Set the default socket timeout (SO_TIMEOUT) in milliseconds which is the timeout for waiting for data.
-        int timeoutSocket = 5000;
+        int timeoutSocket = 10000;
         HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
         response = new DefaultHttpClient(httpParameters).execute(new HttpGet(string));
         return response;

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetMockTask;
@@ -26,7 +27,7 @@ public class HistoryFragment extends SherlockListFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.itemlist, container, false);
+        return inflater.inflate(R.layout.history_fragment, container, false);
     }
 
     @Override
@@ -38,7 +39,7 @@ public class HistoryFragment extends SherlockListFragment{
     public void retrieveData() {
     	contextHelper = new ContextHelper(getActivity());
     	SharedPreferences preferences = contextHelper.checkAndGetSettings();
-    	getSherlockActivity().setSupportProgressBarIndeterminateVisibility(true);
+        ((MainActivity) getSherlockActivity()).setRefreshing(true);
     	executeRequest(preferences);
     }
 
@@ -76,7 +77,9 @@ public class HistoryFragment extends SherlockListFragment{
             try {
                 historyItems = HistoryInfo.createHistoryList(response);
                 contextHelper.updateLastPollingEvent(System.currentTimeMillis());
-                setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
+                if (getActivity() != null) {
+                    setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
+                }
             } catch (JSONException e) {
                 contextHelper.handleJsonException(response, e);
             }
@@ -86,9 +89,9 @@ public class HistoryFragment extends SherlockListFragment{
 
 
     private void stopSpinner() {
-        SherlockFragmentActivity sherlockActivity = getSherlockActivity();
-        if (sherlockActivity != null) {
-            sherlockActivity.setSupportProgressBarIndeterminateVisibility(false);
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity != null) {
+            activity.setRefreshing(false);
         }
     }
 

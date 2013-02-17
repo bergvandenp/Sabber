@@ -1,41 +1,57 @@
 package nl.napauleon.sabber.search;
 
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+
+import org.xml.sax.SAXException;
+
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.SearchRecentSuggestions;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
-import android.view.*;
+import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
-import nl.napauleon.sabber.ContextHelper;
-import nl.napauleon.sabber.R;
-import nl.napauleon.sabber.SettingsActivity;
-import nl.napauleon.sabber.http.*;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchableActivity extends ListActivity {
+import javax.xml.parsers.ParserConfigurationException;
+
+import nl.napauleon.sabber.ContextHelper;
+import nl.napauleon.sabber.R;
+import nl.napauleon.sabber.SettingsActivity;
+import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetTask;
+import nl.napauleon.sabber.http.NzbIndexConnectionHelper;
+import nl.napauleon.sabber.http.SabNzbConnectionHelper;
+
+public class SearchableActivity extends SherlockListActivity {
     private static final String TAG = "SearchableActivity";
 
+    private ProgressDialog dialog;
     private NzbIndexConnectionHelper nzbIndexConnectionHelper;
     private HttpGetTask httpGetTask;
-    private List<String> categories = new ArrayList<String>();
+    private String query;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         httpGetTask = new HttpGetTask(new SearchCallback());
         setContentView(R.layout.itemlist);
@@ -53,9 +69,9 @@ public class SearchableActivity extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.search_menu, menu);
-
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        setupSearchItem(this, menu);
         return true;
     }
 
@@ -68,7 +84,7 @@ public class SearchableActivity extends ListActivity {
 			startActivity(settingsActivity);
 			return true;
 		} else if (itemId == R.id.menu_search) {
-			this.onSearchRequested();
+            onSearchClicked(this, item);
 			return true;
 		} else {
 			return super.onOptionsItemSelected(item);
@@ -77,33 +93,25 @@ public class SearchableActivity extends ListActivity {
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            executeGetCategories();
+            String query = intent.getStringExtra(SearchManager.QUERY);
             nzbIndexConnectionHelper = new NzbIndexConnectionHelper(PreferenceManager.getDefaultSharedPreferences(this));
-            searchNzbs(intent.getStringExtra(SearchManager.QUERY));
-        }
-    }
-
-    private void executeGetCategories() {
-
-        ContextHelper contextHelper = new ContextHelper(this);
-        GetCategoriesCallback getCategoriesCallback = new GetCategoriesCallback();
-        if (contextHelper.isMockEnabled()) {
-            new HttpGetMockTask(getCategoriesCallback).executeRequest("queue/queueresult");
-        } else {
-            new HttpGetTask(getCategoriesCallback).executeRequest(new SabNzbConnectionHelper(contextHelper.checkAndGetSettings()).createQueueConnectionString());
+            searchNzbs(query);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    RecentSearchesProvider.AUTHORITY, RecentSearchesProvider.MODE);
+            suggestions.saveRecentQuery(query, null);
         }
     }
 
     private void searchNzbs(String query) {
-        setProgressBarIndeterminateVisibility(true);
-        ((TextView)findViewById(android.R.id.empty)).setText(R.string.title_loading);
+        this.query = query;
+        dialog = ProgressDialog.show(this, "", getString(R.string.title_loading), true);
         String searchString = nzbIndexConnectionHelper.createSearchString(query);
         Log.i(TAG, "searching with url: " + searchString);
         if (httpGetTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
             httpGetTask.cancel(true);
         }
         httpGetTask = new HttpGetTask(new SearchCallback());
-        httpGetTask.executeRequest(searchString);
+        httpGetTask.execute(searchString);
     }
 
     public class SearchCallback extends DefaultErrorCallback {
@@ -118,16 +126,20 @@ public class SearchableActivity extends ListActivity {
 		
 		public void handleResponse(String response) {
 			List<NzbInfo> results = parseResults(response);
-            setListAdapter(new SearchListAdapter(SearchableActivity.this, results));
+            setListAdapter(new SearchListAdapter(SearchableActivity.this, results, query));
             getListView().setOnItemClickListener(new SearchClickListener(results));
-            setProgressBarIndeterminateVisibility(false);
+            if (dialog != null) {
+                dialog.dismiss();
+            }
 		}
 
 		private void showErrorDialog() {
-            setProgressBarIndeterminateVisibility(false);
+			if (dialog != null) {
+				dialog.dismiss();
+			}
 			new AlertDialog.Builder(SearchableActivity.this)
-			.setTitle("Cannot connect to search provider")
-			.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+			.setMessage("Cannot connect to search provider")
+			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					SearchableActivity.this.finish();
 				}
@@ -165,19 +177,18 @@ public class SearchableActivity extends ListActivity {
         public void onItemClick(final AdapterView<?> parent, View view, final int position, final long rowId) {
             final Context context = parent.getContext();
             new AlertDialog.Builder(context)
-                    .setTitle(context.getString(R.string.question_send_nzb))
-                    .setCancelable(false)
-                    .setPositiveButton(context.getString(R.string.option_positive),
+                    .setMessage(context.getString(R.string.question_send_nzb))
+                    .setPositiveButton(R.string.option_positive,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    if (categories != null && !categories.isEmpty()) {
-                                        createCategoryAlert(context, position).show();
-                                    } else {
-                                        executeAddUrlRequest(context, position);
+                                    SharedPreferences preferences = new ContextHelper(context).checkAndGetSettings();
+                                    if (preferences != null) {
+                                        String connectionString = new SabNzbConnectionHelper(preferences).createAddUrlConnectionString(results.get(position));
+                                        new HttpGetTask(new SearchClickCallback()).execute(connectionString);
                                     }
                                 }
                             })
-                    .setNegativeButton(parent.getContext().getString(R.string.option_negative),
+                    .setNegativeButton(R.string.option_negative,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
@@ -186,34 +197,7 @@ public class SearchableActivity extends ListActivity {
                     .show();
         }
 
-        private AlertDialog.Builder createCategoryAlert(final Context context, final int selectedItemPosition) {
-            return new AlertDialog.Builder(context)
-                    .setTitle(context.getString(R.string.title_select_category))
-                    .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories),
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    executeAddUrlRequest(context, selectedItemPosition, categories.get(i));
-                                }
-                            });
-        }
-
-        private void executeAddUrlRequest(Context context, int position, String category) {
-            SharedPreferences preferences = new ContextHelper(context).checkAndGetSettings();
-            if (preferences != null) {
-                String connectionString = new SabNzbConnectionHelper(preferences).createAddUrlConnectionString(results.get(position), category);
-                new HttpGetTask(new AddUrlCallback()).executeRequest(connectionString);
-            }
-        }
-
-        private void executeAddUrlRequest(Context context, int position) {
-            SharedPreferences preferences = new ContextHelper(context).checkAndGetSettings();
-            if (preferences != null) {
-                String connectionString = new SabNzbConnectionHelper(preferences).createAddUrlConnectionString(results.get(position));
-                new HttpGetTask(new AddUrlCallback()).executeRequest(connectionString);
-            }
-        }
-
-        private class AddUrlCallback extends DefaultErrorCallback {
+        private class SearchClickCallback extends DefaultErrorCallback {
 
 			public void handleResponse(String response) {
 				SearchableActivity.this.finish();
@@ -231,24 +215,24 @@ public class SearchableActivity extends ListActivity {
         }
     }
 
-    private class GetCategoriesCallback extends DefaultErrorCallback {
-
-        public void handleTimeout() {
-            super.handleTimeout(SearchableActivity.this);
+    public static void setupSearchItem(final Activity activity, Menu menu) {
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        if (searchItem != null) {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            if (searchView != null) {
+                final SearchManager searchManager = (SearchManager) activity.getSystemService(
+                        Context.SEARCH_SERVICE);
+                searchView.setSearchableInfo(
+                        searchManager.getSearchableInfo(activity.getComponentName()));
+                searchView.setQueryRefinementEnabled(true);
+            }
         }
+    }
 
-        public void handleError(String error) {
-            super.handleError(SearchableActivity.this, error);
-        }
-
-        public void handleResponse(String response) {
-            handleResult(response);
-
-        }
-
-        private void handleResult(String result) {
-            SabnzbResultHelper sabnzbResultHelper = new SabnzbResultHelper(result);
-            categories = sabnzbResultHelper.parseCategories();
+    public static void onSearchClicked(final Activity activity, MenuItem item) {
+        SearchView searchView = (SearchView) item.getActionView();
+        if (searchView == null) {
+            activity.onSearchRequested();
         }
     }
 }

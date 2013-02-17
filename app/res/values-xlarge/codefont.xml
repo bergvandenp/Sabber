@@ -2,6 +2,7 @@
 <resources>
     <style name="CodeFont">
         <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>

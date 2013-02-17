@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.ContextHelper;
@@ -21,7 +22,6 @@ import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
 import nl.napauleon.sabber.http.HttpGetMockTask;
 import nl.napauleon.sabber.http.HttpGetTask;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 
 import java.util.*;
@@ -32,7 +32,7 @@ public class NotificationService extends Service {
 	public static final String TAG = "NotificationService";
 
 	private PendingIntent notificationIntent;
-	private int notificationId = 100;
+	private final int notificationId = 100;
 
 	private Timer timer;
 
@@ -41,19 +41,18 @@ public class NotificationService extends Service {
     final Runnable pollingThread = new Runnable() {
 		public void run() {
             if (contextHelper.isMockEnabled()) {
-                new HttpGetMockTask(new HistoryCallback()).executeRequest("history/historyresult");
+                new HttpGetMockTask(new HistoryCallback()).execute("history/historyresult");
                 return;
             }
 			String connectionString = createHistoryConnectionString();
-			if (isNetworkConnected() && StringUtils.isNotBlank(connectionString)) {
-				new HttpGetTask(new HistoryCallback()).executeRequest(connectionString);
+			if (isNetworkConnected() && !TextUtils.isEmpty(connectionString)) {
+				new HttpGetTask(new HistoryCallback()).execute(connectionString);
 			}
 		}
 	};
 
     @Override
 	public void onCreate() {
-        notificationId = 100;
         contextHelper = new ContextHelper(NotificationService.this);
 		notificationIntent = PendingIntent.getActivity(
 				NotificationService.this, 0, new Intent(getBaseContext(),
@@ -125,7 +124,7 @@ public class NotificationService extends Service {
 		String hostname = preferences.getString(Constants.HOSTNAME_PREF, "");
 		String port = preferences.getString(Constants.PORT_PREF, "");
 		String apikey = preferences.getString(Constants.APIKEY_PREF, "");
-		if (StringUtils.isNotBlank(hostname) && StringUtils.isNotBlank(port)) {
+		if (!TextUtils.isEmpty(hostname) && !TextUtils.isEmpty(port)) {
 			return String.format(
 					"http://%s:%s/api?mode=history&limit=5&output=json&apikey=%s",
 					hostname,
@@ -154,22 +153,21 @@ public class NotificationService extends Service {
 	private void sendNotification(HistoryInfo historyItem) {
 		Log.i(TAG,
 				"Sending notification for item " + historyItem.getItem()
-						+ " with downloaddate: "
+						+ " with download date: "
 						+ historyItem.getDateDownloadedAsString());
 		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(
 				this)
 				.setContentIntent(notificationIntent)
-				.setSmallIcon(R.drawable.ic_launcher)
+				.setSmallIcon(R.drawable.ic_stat_notify)
+                .setAutoCancel(true)
 				.setContentTitle(getNotificationTitle(historyItem))
 				.setContentText(getNotificationContent(historyItem))
-				.setAutoCancel(true)
 				.setSound(
-                        RingtoneManager.getActualDefaultRingtoneUri(this,
-                                RingtoneManager.TYPE_NOTIFICATION));
+						RingtoneManager.getActualDefaultRingtoneUri(this,
+								RingtoneManager.TYPE_NOTIFICATION));
 		notificationManager.notify(notificationId, builder.build());
-        notificationId += 1;
-    }
+	}
 
 	String getNotificationContent(HistoryInfo historyItem) {
 		return historyItem.getStatus() == Status.Failed

@@ -13,8 +13,8 @@
 
     <string name="title_select_category">Pick a category</string>
     <string name="title_loading">Loading. Please wait…</string>
-    <string name="question_delete_nzb">Delete the selected nzb?</string>
-    <string name="question_send_nzb">Send this nzb to downloadserver?</string>
+    <string name="question_delete_nzb">Delete the selected NZB?</string>
+    <string name="question_send_nzb">Send this NZB to download server?</string>
 
     <string name="option_delete_nzb">Delete item</string>
     <string name="option_change_category">Change category</string>
@@ -26,24 +26,21 @@
     <string name="text_time_left">Time left:</string>
     <string name="text_speed">Current speed:</string>
 
-    <string name="notification_title_completed">Nzb download completed</string>
-    <string name="notification_title_failed">Nzb download failed</string>
+    <string name="notification_title_completed">NZB download completed</string>
+    <string name="notification_title_failed">NZB download failed</string>
     <string name="notification_content_completed">%1$s download completed.</string>
     <string name="notification_content_failed">%1$s download failed.</string>
 
-    <string name="advanced_pref">Advanced preferences</string>
+    <string name="advanced_pref">Advanced Preferences</string>
     <string name="port">Port</string>
-    <string name="apikey">Apikey</string>
-    <string name="hostname">Hostname</string>
-    <string name="pref_min_size_title">Minimal nzb size</string>
-    <string name="pref_min_size_summary">Minimal nzb size in MB</string>
+    <string name="apikey">API key</string>
+    <string name="hostname">SABnzbd hostname</string>
+    <string name="pref_min_size_title">Minimal NZB size</string>
     <string name="pref_refresh_rate_title">Screen refresh rate</string>
-    <string name="pref_refresh_rate_summary">Screen Refresh rate in seconds</string>
     <string name="pref_notifications_title">Enable notifications</string>
     <string name="pref_notifications_summary">Enable background notifications</string>
-    <string name="pref_notifications_refresh_rate_title">Notificationservice Refresh rate</string>
-    <string name="pref_notifications_refresh_rate_summary">Notificationservice Refresh rate in seconds</string>
+    <string name="pref_notifications_refresh_rate_title">Notification service refresh rate</string>
     <string name="unavailable">unavailable</string>
-    <string name="no_results">No results</string>
+    <string name="empty_list">No items to show in this view.</string>
 
 </resources>
