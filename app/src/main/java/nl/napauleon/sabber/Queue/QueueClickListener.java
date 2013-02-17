@@ -35,7 +35,6 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
         if (preferences != null) {
 
             new AlertDialog.Builder(context)
-                    .setTitle("Choose action")
                     .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,
                             Arrays.asList(context.getString(R.string.option_change_category),
                                     context.getString(R.string.option_delete_nzb))),
@@ -61,8 +60,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
         DialogInterface.OnClickListener cancelClickListener = createCancelClickListener();
 
         return new AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.question_delete_nzb))
-                .setCancelable(false)
+                .setMessage(context.getString(R.string.question_delete_nzb))
                 .setPositiveButton(context.getString(R.string.option_positive),
                         deleteClickListener)
                 .setNegativeButton(context.getString(R.string.option_negative),
@@ -71,7 +69,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
 
     private AlertDialog.Builder createCategoryAlert(final QueueInfo queueInfo, final SharedPreferences preferences) {
         return new AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.title_select_category))
+                .setMessage(context.getString(R.string.title_select_category))
                 .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {

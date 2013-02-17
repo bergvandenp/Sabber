@@ -15,10 +15,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:label="@string/settings" android:name=".SettingsActivity">
-        </activity>
+        <activity android:label="@string/settings" android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity" />
 
-        <activity android:label="@string/search" android:launchMode="singleTop" android:name=".search.SearchableActivity" android:exported="false">
+        <activity android:label="@string/search" android:launchMode="singleTop" android:name=".search.SearchableActivity" android:exported="false"
+            android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
             </intent-filter>
@@ -28,5 +29,8 @@
         <service android:name=".history.NotificationService" android:exported="false"/>
 
         <meta-data android:name="android.app.default_searchable" android:value=".search.SearchableActivity"/>
+
+        <provider android:name=".search.RecentSearchesProvider" android:authorities="nl.napauleon.sabber.search" />
+
     </application>
 </manifest>

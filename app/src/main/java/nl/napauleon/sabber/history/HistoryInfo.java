@@ -1,6 +1,6 @@
 package nl.napauleon.sabber.history;
 
-import org.apache.commons.lang3.StringUtils;
+import android.text.TextUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +47,7 @@ public class HistoryInfo {
                 slot.getString("nzb_name").replace(".nzb", ""),
                 slot.getLong("completed") * 1000L,
                 status,
-                StringUtils.isNotBlank(failMessage) ? failMessage : slot.getString("action_line"));
+                TextUtils.isEmpty(failMessage) ? slot.getString("action_line") : failMessage);
     }
     
     public boolean isProcessingComplete() {

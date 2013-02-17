@@ -3,8 +3,16 @@ package nl.napauleon.sabber;
 import nl.napauleon.sabber.history.NotificationService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
+import android.text.TextUtils;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -12,6 +20,19 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
+
+        Preference pref = findPreference("notificationsRefreshratePref");
+        pref.getExtras().putString("suffix", "s");
+        bindPreferenceSummaryToValue(pref);
+
+        pref = findPreference("screenRefreshratePref");
+        pref.getExtras().putString("suffix", "s");
+        bindPreferenceSummaryToValue(pref);
+
+        pref = findPreference("minsizePref");
+        pref.getExtras().putString("suffix", " MB");
+        bindPreferenceSummaryToValue(pref);
+
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -46,4 +67,34 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
+
+    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+        public boolean onPreferenceChange(Preference preference, Object value) {
+            String stringValue = value.toString();
+            String suffix = preference.getExtras().getString("suffix", "");
+
+            if (preference instanceof ListPreference) {
+                ListPreference listPreference = (ListPreference) preference;
+                int index = listPreference.findIndexOfValue(stringValue);
+
+                preference.setSummary(
+                        index >= 0
+                                ? listPreference.getEntries()[index] + suffix
+                                : null);
+
+            } else {
+                preference.setSummary(stringValue + suffix);
+            }
+            return true;
+        }
+    };
+
+    private static void bindPreferenceSummaryToValue(Preference preference) {
+        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                PreferenceManager
+                        .getDefaultSharedPreferences(preference.getContext())
+                        .getString(preference.getKey(), ""));
+    }
+
 }
