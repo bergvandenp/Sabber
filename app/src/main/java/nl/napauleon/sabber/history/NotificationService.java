@@ -32,7 +32,7 @@ public class NotificationService extends Service {
 	public static final String TAG = "NotificationService";
 
 	private PendingIntent notificationIntent;
-	private final int notificationId = 100;
+	private int notificationId = 100;
 
 	private Timer timer;
 
@@ -166,7 +166,7 @@ public class NotificationService extends Service {
 				.setSound(
 						RingtoneManager.getActualDefaultRingtoneUri(this,
 								RingtoneManager.TYPE_NOTIFICATION));
-		notificationManager.notify(notificationId, builder.build());
+		notificationManager.notify(++notificationId, builder.build());
 	}
 
 	String getNotificationContent(HistoryInfo historyItem) {
