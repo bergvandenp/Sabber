@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.Constants;
 import nl.napauleon.sabber.ContextHelper;
@@ -137,14 +136,16 @@ public class DownloadingFragment extends SherlockListFragment {
 
         private void handleResult(String result) {
             SabnzbResultHelper sabnzbResultHelper = new SabnzbResultHelper(result);
-            togglePause(sabnzbResultHelper.isPaused());
 
             queueItems = sabnzbResultHelper.parseQueueItems();
             FragmentActivity activity = getActivity();
-            if (queueItems != null && activity != null) {
-                setListAdapter(new QueueListAdapter(activity, queueItems));
-                itemClickListener.setCategories(sabnzbResultHelper.parseCategories());
-                itemClickListener.setQueueItems(queueItems);
+            if (activity != null) {
+                togglePause(sabnzbResultHelper.isPaused());
+                if (queueItems != null) {
+                    setListAdapter(new QueueListAdapter(activity, queueItems));
+                    itemClickListener.setCategories(sabnzbResultHelper.parseCategories());
+                    itemClickListener.setQueueItems(queueItems);
+                }
             }
 
             populateGlobalInformation(sabnzbResultHelper.parseGlobalInfo());
