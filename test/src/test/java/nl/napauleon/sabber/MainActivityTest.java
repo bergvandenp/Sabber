@@ -19,6 +19,6 @@ public class MainActivityTest {
     @Test
     public void testOnCreate() throws Exception {
         activity.onCreate(null);
-        assertNotNull(activity.findViewById(R.id.main));
+        assertNotNull(activity.findViewById(R.id.pager));
     }
 }

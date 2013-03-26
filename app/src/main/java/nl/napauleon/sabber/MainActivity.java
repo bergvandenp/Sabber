@@ -57,6 +57,13 @@ public class MainActivity extends SherlockFragmentActivity {
 		}
 
         // set up viewpager
+        setUpPager();
+
+        // set up tabs
+        setUpActionbar();
+    }
+
+    private void setUpPager() {
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -82,28 +89,31 @@ public class MainActivity extends SherlockFragmentActivity {
         pager.setPageMarginDrawable(R.drawable.list_divider_holo_light);
         pager.setPageMargin((int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
+    }
 
-        // set up tabs
+    private void setUpActionbar() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayShowTitleEnabled(false);
+        if (actionBar != null) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.setDisplayShowTitleEnabled(false);
 
-        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-                pager.setCurrentItem(tab.getPosition());
-            }
+            ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+                public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+                    pager.setCurrentItem(tab.getPosition());
+                }
 
-            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-            }
+                public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                }
 
-            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-            }
-        };
+                public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+                }
+            };
 
-        actionBar.addTab(actionBar.newTab().setText(R.string.downloading)
-                .setTabListener(tabListener).setTag(TAG_DOWNLOADING_TAB));
-        actionBar.addTab(actionBar.newTab().setText(R.string.history)
-                .setTabListener(tabListener).setTag(TAG_HISTORY_TAB));
+            actionBar.addTab(actionBar.newTab().setText(R.string.downloading)
+                    .setTabListener(tabListener).setTag(TAG_DOWNLOADING_TAB));
+            actionBar.addTab(actionBar.newTab().setText(R.string.history)
+                    .setTabListener(tabListener).setTag(TAG_HISTORY_TAB));
+        }
     }
 
     public void setRefreshing(boolean refreshing) {

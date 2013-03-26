@@ -19,8 +19,9 @@ import static org.junit.Assert.assertTrue;
 public class NotificationServiceTest {
 	
 	NotificationService service;
-	
-	@Before
+    private Calendar downloadDate;
+
+    @Before
 	public void setUp() {
         SharedPreferences preferences = ShadowPreferenceManager.getDefaultSharedPreferences(new MainActivity());
         SharedPreferences.Editor editor = preferences.edit();
@@ -29,23 +30,26 @@ public class NotificationServiceTest {
         editor.putLong(Constants.LAST_POLLING_EVENT_PREF, lastPollingDate.getTimeInMillis());
         editor.commit();
 		service = new NotificationService();
+
+        downloadDate = Calendar.getInstance();
+        downloadDate.add(Calendar.MINUTE, -1);
 	}
 
     @Test
     public void testShouldNotify_Completed() {
-        boolean result = service.shouldNotify(new HistoryInfo("bla", Calendar.getInstance().getTimeInMillis(), Status.Completed, "bla"));
+        boolean result = service.shouldNotify(new HistoryInfo("bla", downloadDate.getTimeInMillis(), Status.Completed, "bla"));
         assertTrue(result);
     }
 
     @Test
     public void testShouldNotify_Failed() {
-        boolean result = service.shouldNotify(new HistoryInfo("bla", Calendar.getInstance().getTimeInMillis(), Status.Failed, "bla"));
+        boolean result = service.shouldNotify(new HistoryInfo("bla", downloadDate.getTimeInMillis(), Status.Failed, "bla"));
         assertTrue(result);
     }
 
     @Test
     public void testShouldNotify_False_Extracting() {
-        boolean result = service.shouldNotify(new HistoryInfo("bla", Calendar.getInstance().getTimeInMillis(), Status.Extracting, "bla"));
+        boolean result = service.shouldNotify(new HistoryInfo("bla", downloadDate.getTimeInMillis(), Status.Extracting, "bla"));
         assertFalse(result);
     }
 
@@ -82,7 +86,7 @@ public class NotificationServiceTest {
     @Test
     public void testGetNotificationTitle_Completed() {
         HistoryInfo item = new HistoryInfo("bla", Calendar.getInstance().getTimeInMillis(), Status.Completed, "bla");
-        String expected = "Nzb download completed";
+        String expected = "NZB download completed";
 
         String result = service.getNotificationTitle(item);
 
@@ -92,7 +96,7 @@ public class NotificationServiceTest {
     @Test
     public void testGetNotificationTitle_Failed() {
         HistoryInfo item = new HistoryInfo("bla", Calendar.getInstance().getTimeInMillis(), Status.Failed, "bla");
-        String expected = "Nzb download failed";
+        String expected = "NZB download failed";
 
         String result = service.getNotificationTitle(item);
 

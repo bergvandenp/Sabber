@@ -12,6 +12,7 @@ import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
 import nl.napauleon.sabber.R;
 import nl.napauleon.sabber.http.DefaultErrorCallback;
+import nl.napauleon.sabber.http.HttpGetMockTask;
 import nl.napauleon.sabber.http.HttpGetTask;
 import nl.napauleon.sabber.http.SabNzbConnectionHelper;
 
@@ -69,11 +70,15 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
 
     private AlertDialog.Builder createCategoryAlert(final QueueInfo queueInfo, final SharedPreferences preferences) {
         return new AlertDialog.Builder(context)
-                .setMessage(context.getString(R.string.title_select_category))
-                .setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories),
+                .setSingleChoiceItems(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, categories), 0,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                new HttpGetTask(queueClickCallback).executeRequest(new SabNzbConnectionHelper(preferences).createChangeCategoryConnectionString(queueInfo.getId(), categories.get(i)));
+                                if (new ContextHelper(context).isMockEnabled()) {
+                                    new HttpGetMockTask(queueClickCallback).executeRequest("ok");
+                                } else {
+                                    new HttpGetTask(queueClickCallback).executeRequest(new SabNzbConnectionHelper(preferences).createChangeCategoryConnectionString(queueInfo.getId(), categories.get(i)));
+                                }
+                                dialogInterface.dismiss();
                             }
                         });
     }
@@ -82,6 +87,7 @@ public class QueueClickListener implements AdapterView.OnItemClickListener{
         return new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         new HttpGetTask(queueClickCallback).executeRequest(new SabNzbConnectionHelper(preferences).createDeleteItemConnectionString(queueInfo.getId()));
+                        dialog.dismiss();
                     }
                 };
     }

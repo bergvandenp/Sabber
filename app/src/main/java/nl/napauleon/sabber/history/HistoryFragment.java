@@ -1,11 +1,11 @@
 package nl.napauleon.sabber.history;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.SherlockListFragment;
 import nl.napauleon.sabber.ContextHelper;
 import nl.napauleon.sabber.MainActivity;
@@ -37,9 +37,13 @@ public class HistoryFragment extends SherlockListFragment{
     }
 
     public void retrieveData() {
-    	contextHelper = new ContextHelper(getActivity());
+        Activity activity = getActivity();
+    	contextHelper = new ContextHelper(activity);
     	SharedPreferences preferences = contextHelper.checkAndGetSettings();
-        ((MainActivity) getSherlockActivity()).setRefreshing(true);
+        if (activity != null) {
+            ((MainActivity) activity).setRefreshing(true);
+
+        }
     	executeRequest(preferences);
     }
 
@@ -76,6 +80,9 @@ public class HistoryFragment extends SherlockListFragment{
         private void handleResult(String response) {
             try {
                 historyItems = HistoryInfo.createHistoryList(response);
+                if(contextHelper == null) {
+                    contextHelper = new ContextHelper(getActivity());
+                }
                 contextHelper.updateLastPollingEvent(System.currentTimeMillis());
                 if (getActivity() != null) {
                     setListAdapter(new HistoryListAdapter(getActivity(), historyItems));
