@@ -17,8 +17,6 @@ public class DownloadingFragmentTest extends RobotiumTest {
 	
 	public void testChangeCategory() throws Exception {
 		
-		enterMockSettings();
-		
 		solo.clickOnText(solo.getString(R.string.downloading));
 		solo.clickInList(0);
 		solo.clickOnText(solo.getString(R.string.option_change_category));
@@ -27,8 +25,6 @@ public class DownloadingFragmentTest extends RobotiumTest {
 	}
 
 	public void testHistoryMock() throws Exception {
-		
-		enterMockSettings();
 		
 		solo.clickOnText(solo.getString(R.string.history));
 		assertTrue(solo.searchText("Anne Rice"));
