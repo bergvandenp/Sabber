@@ -3,6 +3,6 @@
     android:label="@string/app_name"
     android:hint="@string/search_hint"
     android:imeOptions="actionSearch"
-    android:inputType="textCapSentences|textShortMessage"
+    android:inputType="text"
     android:searchSuggestAuthority="nl.napauleon.sabber.search"
     android:searchSuggestSelection=" ? " />
