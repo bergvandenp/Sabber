@@ -24,30 +24,30 @@
     <dependencies>
         <!-- gotta install the support jar in your own maven repo first! 
              It's not available in the public maven repo -->
-        <dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>support-v4</artifactId>
-			<version>r11</version>
-        </dependency>
+        <!--<dependency>-->
+			<!--<groupId>com.google.android</groupId>-->
+			<!--<artifactId>support-v4</artifactId>-->
+			<!--<version>r11</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
             <version>4.2.2_r2</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.actionbarsherlock</groupId>
-            <artifactId>library</artifactId>
-            <version>${abs.version}</version>
-            <type>apklib</type>
-        </dependency>
-        <dependency>
-            <groupId>com.actionbarsherlock</groupId>
-            <artifactId>library</artifactId>
-            <version>${abs.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.actionbarsherlock</groupId>-->
+            <!--<artifactId>library</artifactId>-->
+            <!--<version>${abs.version}</version>-->
+            <!--<type>apklib</type>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.actionbarsherlock</groupId>-->
+            <!--<artifactId>library</artifactId>-->
+            <!--<version>${abs.version}</version>-->
+            <!--<type>jar</type>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="side_margin">16dp</dimen>
+
+    <style name="CodeFont">
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="CodeFont_global_header">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CodeFont_global">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+    </style>
+
+</resources>

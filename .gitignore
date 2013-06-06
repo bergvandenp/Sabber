@@ -17,3 +17,4 @@ app/previews.xml
 photoshop/
 *.ipr
 *.iws
+.gradle

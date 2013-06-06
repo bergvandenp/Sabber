@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:id="@+id/namedaterow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/itemname"
+            style="@style/CodeFont"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="32dp"
+            android:text="@string/unavailable" />
+
+        <TextView
+            android:id="@+id/itemdate"
+            style="@style/CodeFont.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unavailable" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/historymessage"
+        style="@style/CodeFont.Small"
+        android:textAllCaps="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/unavailable"
+        android:textColor="@color/red"
+        android:textStyle="bold" />
+
+</LinearLayout>
