@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="action_button_min_width">56dp</dimen>
-    <dimen name="global_info_pane_width">300dp</dimen>
-    <dimen name="side_margin">0dp</dimen>
-</resources>
