@@ -32,3 +32,4 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/timeleft" />
 </RelativeLayout>
+<!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/layout/downloading_progress.xml -->

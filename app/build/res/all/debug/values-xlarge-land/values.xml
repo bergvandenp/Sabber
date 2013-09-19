@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/values-xlarge-land/dimens.xml -->
     <dimen name="side_margin">96dp</dimen>
 
 </resources>

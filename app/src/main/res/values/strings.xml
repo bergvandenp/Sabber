@@ -34,6 +34,7 @@
     <string name="advanced_pref">Advanced Preferences</string>
     <string name="port">Port</string>
     <string name="apikey">API key</string>
+    <string name="pref_apikey_search_provider">API key search provider</string>
     <string name="hostname">SABnzbd hostname</string>
     <string name="pref_min_size_title">Minimal NZB size</string>
     <string name="pref_refresh_rate_title">Screen refresh rate</string>
@@ -42,5 +43,14 @@
     <string name="pref_notifications_refresh_rate_title">Notification service refresh rate</string>
     <string name="unavailable">unavailable</string>
     <string name="empty_list">No items to show in this view.</string>
+    <string name="pref_search_provider">Search Provider</string>
+
+    <string-array name="options_search_providers">
+        <item>Usenet Crawler</item>
+    </string-array>
+
+    <string-array name="options_search_providers_values">
+        <item>http://www.usenet-crawler.com</item>
+    </string-array>
 
 </resources>

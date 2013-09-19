@@ -19,3 +19,4 @@
         android:visibility="gone"
         android:text="@string/empty_list" />
 </FrameLayout>
+<!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/layout/itemlist.xml -->

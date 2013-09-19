@@ -6,3 +6,4 @@
     android:inputType="text"
     android:searchSuggestAuthority="nl.napauleon.sabber.search"
     android:searchSuggestSelection=" ? " />
+<!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/xml/searchable.xml -->

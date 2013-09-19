@@ -19,3 +19,4 @@
         android:id="@+id/menu_settings"
         android:title="@string/settings" />
 </menu>
+<!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/menu/main_menu.xml -->

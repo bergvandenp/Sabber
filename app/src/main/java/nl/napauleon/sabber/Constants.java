@@ -8,6 +8,8 @@ public class Constants {
     public static final String HOSTNAME_PREF = "hostnamePref";
     public static final String PORT_PREF = "portPref";
     public static final String APIKEY_PREF = "apikeyPref";
+    public static final String APIKEY_SEARCH_PREF = "apikeySearchPref";
+    public static final String SEARCH_PROVIDER_PREF = "searchProviderPref";
     public static final String SCREEN_REFRESHRATE_PREF = "screenRefreshratePref";
     public static final String NOTIFICATIONS_REFRESHRATE_PREF = "notificationsRefreshratePref";
     public static final String LAST_POLLING_EVENT_PREF = "lastpollingeventPref";

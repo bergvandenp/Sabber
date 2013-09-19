@@ -8,8 +8,6 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.actionbarsherlock.BuildConfig;
-
 public class ContextHelper {
 
     private final SharedPreferences prefs;

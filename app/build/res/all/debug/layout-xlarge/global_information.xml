@@ -66,3 +66,4 @@
         android:text="@string/unavailable"
         android:layout_marginBottom="16dp" />
 </LinearLayout>
+<!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/layout-xlarge/global_information.xml -->
