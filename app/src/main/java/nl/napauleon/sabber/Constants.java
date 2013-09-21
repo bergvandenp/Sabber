@@ -16,4 +16,5 @@ public class Constants {
     public static final String NOTIFICATIONS_PREF = "notificationsPref";
     public static final String MESSAGE_CONNECTION_TIMEOUT = "Connection Timeout. Please try again later";
     public static final String MESSAGE_SETTINGS_NOT_VALID = "Settings are not valid. Check host and port configuration.";
+    public static final String HTTPS_PREF = "httpsPref";
 }

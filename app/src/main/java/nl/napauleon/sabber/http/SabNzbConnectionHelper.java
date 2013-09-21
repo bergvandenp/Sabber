@@ -16,11 +16,13 @@ public class SabNzbConnectionHelper {
     private static final String TAG = "SabNzbConnectionHelper";
 
     private final String host, port, apikey;
+    private final boolean https;
 
     public SabNzbConnectionHelper(SharedPreferences preferences) {
         host = preferences.getString(Constants.HOSTNAME_PREF, "");
         port = preferences.getString(Constants.PORT_PREF, "");
         apikey = preferences.getString(Constants.APIKEY_PREF, "");
+        https = preferences.getBoolean(Constants.HTTPS_PREF, false);
     }
 
     public String createAddUrlConnectionString(NzbInfo nzbInfo) {
@@ -32,17 +34,12 @@ public class SabNzbConnectionHelper {
             name = matcher.group(1);
         }
         try {
-            String format = String.format(createBaseConnectionString() + "&mode=addurl&name=%s&nzbname=%s", URLEncoder.encode(link, ENCODING),
+            return String.format(createBaseConnectionString() + "&mode=addurl&name=%s&nzbname=%s", URLEncoder.encode(link, ENCODING),
                     URLEncoder.encode(name, ENCODING));
-            return format;
         } catch (UnsupportedEncodingException e) {
             Log.e(TAG, "Unsupported encoding: " + ENCODING, e);
         }
         return null;
-    }
-
-    public String createAddUrlConnectionString(NzbInfo nzbInfo, String category) {
-        return createAddUrlConnectionString(nzbInfo) + "&cat=" + category;
     }
 
     public String createHistoryConnectionString() {
@@ -70,7 +67,7 @@ public class SabNzbConnectionHelper {
     }
 
     private String createBaseConnectionString() {
-        return String.format("http://%s:%s/api?output=json&apikey=%s",
-                host, port, apikey);
+        return String.format("%s://%s:%s/api?output=json&apikey=%s",
+                https ? "https" : "http", host, port, apikey);
     }
 }
