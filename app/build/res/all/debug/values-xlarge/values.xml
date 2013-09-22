@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/build/exploded-bundles/ComActionbarsherlockActionbarsherlock440.aar/res/values-xlarge/values.xml -->
+    <dimen name="abs__action_bar_default_height">56dip</dimen>
+    <dimen name="abs__action_bar_icon_vertical_padding">4dip</dimen>
+    <dimen name="abs__action_bar_subtitle_bottom_margin">9dip</dimen>
+    <dimen name="abs__action_bar_subtitle_text_size">14dp</dimen>
+    <dimen name="abs__action_bar_subtitle_top_margin">-3dp</dimen>
+    <dimen name="abs__action_bar_title_text_size">18dp</dimen>
+    <dimen name="abs__action_button_min_width">64dip</dimen>
+
+    <item name="abs__dialog_min_width_major" type="dimen">45%</item>
+    <item name="abs__dialog_min_width_minor" type="dimen">72%</item>
+    <!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/values-xlarge/dimens.xml -->
+    <dimen name="side_margin">16dp</dimen>
+    <!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/values-xlarge/codefont.xml -->
+    <style name="CodeFont">
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/values-xlarge/codefont_global.xml -->
+    <style name="CodeFont_global">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+    </style>
+    <!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/values-xlarge/codefont_global_header.xml -->
+    <style name="CodeFont_global_header">
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+</resources>

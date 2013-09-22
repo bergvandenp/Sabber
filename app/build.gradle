@@ -15,6 +15,20 @@ repositories {
 android {
     compileSdkVersion 18
     buildToolsVersion "18.0.1"
+
+    signingConfigs {
+        release {
+            storeFile file(signKeystore)
+            storePassword signStorepass
+            keyAlias signAlias
+            keyPassword signKeypass
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
 }
 
 dependencies {

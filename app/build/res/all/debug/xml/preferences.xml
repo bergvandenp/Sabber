@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:name="Hostname Preference"
+        android:defaultValue=""
+        android:inputType="textUri"
+        android:key="hostnamePref"
+        android:title="@string/hostname" />
+    <EditTextPreference
+        android:name="Port Preference"
+        android:defaultValue="8080"
+        android:inputType="number"
+        android:key="portPref"
+        android:title="@string/port" />
+
+    <CheckBoxPreference
+        android:name="Https Preference"
+        android:key="httpsPref"
+        android:title="@string/pref_https"/>
+
+    <EditTextPreference
+        android:name="Apikey Preference"
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="apikeyPref"
+        android:title="@string/apikey" />
+
+    <ListPreference
+        android:key="searchProviderPref"
+        android:title="@string/pref_search_provider"
+        android:dialogTitle="@string/pref_search_provider"
+        android:entries="@array/options_search_providers"
+        android:entryValues="@array/options_search_providers_values"/>
+
+    <EditTextPreference
+        android:name="Apikey Search Provider Preference"
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="apikeySearchPref"
+        android:title="@string/pref_apikey_search_provider" />
+
+    <CheckBoxPreference
+        android:name="Notifications Preference"
+        android:key="notificationsPref"
+        android:title="@string/pref_notifications_title" />
+
+    <PreferenceCategory android:title="@string/advanced_pref" >
+        <EditTextPreference
+            android:name="Minimal size Preference"
+            android:inputType="number"
+            android:key="minsizePref"
+            android:title="@string/pref_min_size_title" />
+        <EditTextPreference
+            android:name="Screen refresh rate Preference"
+            android:inputType="number"
+            android:key="screenRefreshratePref"
+            android:defaultValue="10"
+            android:title="@string/pref_refresh_rate_title" />
+        <EditTextPreference
+            android:name="Notifications refresh rate Preference"
+            android:inputType="number"
+            android:key="notificationsRefreshratePref"
+            android:defaultValue="60"
+            android:title="@string/pref_notifications_refresh_rate_title" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
+<!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/xml/preferences.xml -->
