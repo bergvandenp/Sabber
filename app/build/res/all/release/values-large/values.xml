@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <!-- From: file:/Users/napauleon/Dropbox/Projecten/Sabber/app/src/main/res/values-large/dimens.xml -->
-    <dimen name="action_button_min_width">64dp</dimen>
-
-</resources>

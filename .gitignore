@@ -10,6 +10,7 @@ out/
 tmp/
 app/target/
 app/gen/
+app/build
 app/.pom.xml.swp
 app/gen-external-apklibs/*
 target/
