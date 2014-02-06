@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.5.+'
+        classpath 'com.android.tools.build:gradle:0.8.+'
     }
 }
 
@@ -35,4 +35,8 @@ dependencies {
     compile 'com.android.support:support-v4:18.0.0'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile 'org.apache.commons:commons-lang3:3.1'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.10'
 }
