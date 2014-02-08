@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/text_timeleft"
@@ -15,10 +16,7 @@
 
     <TextView
         android:id="@+id/timeleft"
-        style="@style/CodeFont.Small"
-        android:textColor="#000"
-        android:fontFamily="sans-serif"
-        android:textStyle="bold"
+        style="@style/CodeFont.Small.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/text_timeleft"

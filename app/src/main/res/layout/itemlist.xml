@@ -9,13 +9,10 @@
         android:layout_height="match_parent" />
 
     <TextView android:id="@android:id/empty"
+        style="@style/CodeFont.Grey"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:padding="32dp"
         android:fontFamily="sans-serif-light"
-        android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="#80000000"
-        android:visibility="gone"
-        android:text="@string/empty_list" />
+        android:text="@string/empty_list"/>
 </FrameLayout>

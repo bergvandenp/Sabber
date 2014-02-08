@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CodeFont.Small" parent="CodeFont.Medium">
+        <item name="android:textAppearance">@android:style/TextAppearance.Small</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+</resources>

@@ -12,7 +12,7 @@
 
         <TextView
             android:id="@+id/itemname"
-            style="@style/CodeFont"
+            style="@style/CodeFont.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -29,13 +29,12 @@
 
     <TextView
         android:id="@+id/historymessage"
-        style="@style/CodeFont.Small"
+        style="@style/CodeFont.Small.Bold"
         android:textAllCaps="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/unavailable"
-        android:textColor="@color/red"
-        android:textStyle="bold" />
+        android:textColor="@color/red"/>
 
 </LinearLayout>
