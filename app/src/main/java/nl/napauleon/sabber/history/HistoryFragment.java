@@ -33,21 +33,18 @@ public class HistoryFragment extends SherlockListFragment{
     @Override
     public void onResume() {
         super.onResume();
+        Activity activity = getActivity();
+    	contextHelper = new ContextHelper(activity);
+        startSpinner();
         retrieveData();
     }
 
     public void retrieveData() {
-        Activity activity = getActivity();
-    	contextHelper = new ContextHelper(activity);
-    	SharedPreferences preferences = contextHelper.checkAndGetSettings();
-        if (activity != null) {
-            ((MainActivity) activity).setRefreshing(true);
-
-        }
-    	executeRequest(preferences);
+        SharedPreferences preferences = contextHelper.checkAndGetSettings();
+        executeRequest(preferences);
     }
 
-	private void executeRequest(SharedPreferences preferences) {
+    private void executeRequest(SharedPreferences preferences) {
 		if (preferences != null) {
             if (contextHelper.isMockEnabled()) {
 	    		new HttpGetMockTask(new HistoryFragmentCallback()).executeRequest("history/historyresult");
@@ -93,7 +90,11 @@ public class HistoryFragment extends SherlockListFragment{
         }
     }
 
-
+    private void startSpinner() {
+        if (getActivity() != null) {
+            ((MainActivity) getActivity()).setRefreshing(true);
+        }
+    }
 
     private void stopSpinner() {
         MainActivity activity = (MainActivity) getActivity();
