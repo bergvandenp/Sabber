@@ -12,7 +12,7 @@
     <string name="menu_play">Hervatten</string>
 
     <string name="title_select_category">Selecteer een categorie</string>
-    <string name="title_loading">Aan het laden. Een moment geduld...</string>
+    <string name="title_loading">Aan het laden. Een moment geduld…</string>
     <string name="question_delete_nzb">De geselecteerde NZB verwijderen?</string>
     <string name="question_send_nzb">Deze NZB naar de downloadserver sturen?</string>
 
@@ -35,6 +35,7 @@
     <string name="advanced_pref">Geavanceerde instellingen</string>
     <string name="port">Poort</string>
     <string name="apikey">Apikey</string>
+    <string name="pref_apikey_search_provider">API key zoekmachine</string>
     <string name="hostname">Server adres</string>
     <string name="pref_min_size_title">Minimale NZB grootte</string>
     <string name="pref_refresh_rate_title">Scherm ververstijd</string>
@@ -50,5 +51,12 @@
     <string name="pref_host_settings">Host</string>
     <string name="pref_theme_dark">Gebruik donker thema</string>
 
+    <string-array name="options_search_providers">
+        <item>Usenet Crawler</item>
+    </string-array>
+
+    <string-array name="options_search_providers_values">
+        <item>http://www.usenet-crawler.com</item>
+    </string-array>
 
 </resources>
