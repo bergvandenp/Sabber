@@ -44,11 +44,15 @@
     <string name="unavailable">unavailable</string>
     <string name="empty_list">No items to show in this view.</string>
     <string name="no_results">Geen resultaten</string>
+    <string name="preferences">Preferences</string>
+    <string name="connection_settings">Connections</string>
     <string name="pref_search_provider">Search Provider</string>
     <string name="pref_https">Enable https</string>
     <string name="pref_search_providers">Search Providers</string>
     <string name="pref_host_settings">Host</string>
     <string name="pref_theme_dark">Use dark theme</string>
+    <string name="pref_connections">Connection settings</string>
+    <string name="pref_preferences">Global app preferences</string>
 
     <string-array name="options_search_providers">
         <item>Usenet Crawler</item>

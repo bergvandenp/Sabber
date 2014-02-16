@@ -3,7 +3,6 @@ package nl.napauleon.sabber;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -16,22 +15,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addPreferencesFromResource(R.xml.preferences);
-
-        Preference pref = findPreference("notificationsRefreshratePref");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        String settings = getArguments().getString("settings");
+        if ("preferences".equals(settings)) {
+            addPreferencesFromResource(R.xml.preferences);
+            Preference pref = findPreference("notificationsRefreshratePref");
+            assert pref != null;
             pref.getExtras().putString("suffix", "s");
             bindPreferenceSummaryToValue(pref);
 
             pref = findPreference("screenRefreshratePref");
+            assert pref != null;
             pref.getExtras().putString("suffix", "s");
             bindPreferenceSummaryToValue(pref);
 
             pref = findPreference("minsizePref");
+            assert pref != null;
             pref.getExtras().putString("suffix", " MB");
             bindPreferenceSummaryToValue(pref);
-
+        } else if ("connections".equals(settings)) {
+            addPreferencesFromResource(R.xml.preferences_connections);
         }
+
+
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

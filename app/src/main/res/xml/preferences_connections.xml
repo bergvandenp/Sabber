@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:name="Hostname Preference"
+        android:defaultValue=""
+        android:inputType="textUri"
+        android:key="hostnamePref"
+        android:title="@string/hostname" />
+    <EditTextPreference
+        android:name="Port Preference"
+        android:defaultValue="8080"
+        android:inputType="number"
+        android:key="portPref"
+        android:title="@string/port" />
+
+    <CheckBoxPreference
+        android:name="Https Preference"
+        android:key="httpsPref"
+        android:title="@string/pref_https"/>
+
+    <EditTextPreference
+        android:name="Apikey Preference"
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="apikeyPref"
+        android:title="@string/apikey" />
+
+    <ListPreference
+        android:key="searchProviderPref"
+        android:title="@string/pref_search_provider"
+        android:dialogTitle="@string/pref_search_provider"
+        android:entries="@array/options_search_providers"
+        android:entryValues="@array/options_search_providers_values"/>
+
+    <EditTextPreference
+        android:name="Apikey Search Provider Preference"
+        android:defaultValue=""
+        android:inputType="text"
+        android:key="apikeySearchPref"
+        android:title="@string/pref_apikey_search_provider" />
+</PreferenceScreen>

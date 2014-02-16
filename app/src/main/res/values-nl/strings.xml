@@ -44,12 +44,16 @@
     <string name="pref_notifications_refresh_rate_title">Achtergrond notificaties ververstijd</string>
     <string name="unavailable">niet beschikbaar</string>
     <string name="empty_list">Geen items in dit overzicht.</string>
+    <string name="preferences">Voorkeuren</string>
     <string name="pref_search_provider">Zoekmachine</string>
     <string name="no_results">Geen resultaten</string>
     <string name="pref_https">Gebruik https</string>
     <string name="pref_search_providers">Zoekmachines</string>
     <string name="pref_host_settings">Host</string>
     <string name="pref_theme_dark">Gebruik donker thema</string>
+    <string name="pref_preferences">Globale app voorkeuren</string>
+    <string name="pref_connections">Verbinding instellingen</string>
+    <string name="connection_settings">verbindingen</string>
 
     <string-array name="options_search_providers">
         <item>Usenet Crawler</item>
