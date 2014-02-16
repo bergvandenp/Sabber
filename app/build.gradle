@@ -40,7 +40,6 @@ dependencies {
 }
 
 task incrementVersionCode << {
-    println(":incrementVersionCode - Incrementing Version Code...")
     def manifestFile = file("src/main/AndroidManifest.xml")
     def patternVersionCode = Pattern.compile("versionCode=\"(\\d+)\"")
     def manifestText = manifestFile.getText()
@@ -55,7 +54,6 @@ task incrementVersionCode << {
 }
 
 task incrementVersionName << {
-    println(":incrementVersionName - Incrementing Version Name...")
     def manifestFile = file("src/main/AndroidManifest.xml")
     def patternVersionNumber = Pattern.compile("versionName=\"(\\d+)\\.(\\d+)\\.(\\d+)\"")
     def manifestText = manifestFile.getText()
@@ -76,12 +74,19 @@ task release << {
     println(":release - Build and Version Increment")
 }
 
+task commitManifest(type: Exec) {
+    commandLine "git", "commit", "src/main/AndroidManifest.xml", "-m" , "new release version"
+}
+
 incrementVersionName.mustRunAfter build
 incrementVersionCode.mustRunAfter build
+commitManifest.mustRunAfter incrementVersionName
+commitManifest.mustRunAfter incrementVersionCode
 
 release.dependsOn assembleRelease
 release.dependsOn incrementVersionCode
 release.dependsOn incrementVersionName
+release.dependsOn commitManifest
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.10'
