@@ -4,8 +4,9 @@ buildscript {
     repositories {
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.8.+'
+        classpath 'com.android.tools.build:gradle:0.9.+'
     }
 }
 
@@ -21,9 +22,9 @@ android {
     signingConfigs {
         release {
             storeFile file(signKeystore)
-            storePassword signStorepass
+            storePassword signStorePass
             keyAlias signAlias
-            keyPassword signKeypass
+            keyPassword signKeyPass
         }
     }
     buildTypes {
